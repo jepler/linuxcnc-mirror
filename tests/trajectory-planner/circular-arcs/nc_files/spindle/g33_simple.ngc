@@ -1,7 +1,7 @@
 G90 G20 G64 (absolute distance mode)
 G0 X1 Z0.1 (rapid to position)
-S100 M3 (start spindle turning)
-G33 Z-2 K0.025
+S321 M3 (start spindle turning)
+G33 Z-2 K0.05
 G0 X1.25 (rapid move tool away from work)
 Z0.1 (rapid move to starting Z position)
 M9

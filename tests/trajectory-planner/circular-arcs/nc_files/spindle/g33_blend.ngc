@@ -1,0 +1,24 @@
+(From TP Issue #68)
+G20 G8 G18
+G64 P0.01 Q0.0
+M3 S400
+G0 X2.0 Z0
+G0 X1.1 Z0.1
+(Lead-in move in "normal" feed mode)
+G1 X1.0 Z0.0 F20
+(No blend here - switch to position sync mode)
+G33 K0.1 X1.0 Z-0.5
+(Tangent blend during position sync)
+G33 K0.1 X1.0 Z-0.75
+G33 K0.1 X1.0 Z-1.0
+(Arc blend here during position sync)
+G33 K0.1 X0.800 Z-1.5
+(Arc blend here during position sync)
+G33 K0.1 X0.800 Z-2.0
+(No blend here - switch to normal mode)
+G1 X1.1 Z-2.1 F20
+(Clear work)
+G0 X2.0
+G0 Z0
+M5
+M2

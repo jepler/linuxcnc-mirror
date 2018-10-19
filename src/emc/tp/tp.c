@@ -21,6 +21,7 @@
 #include "motion_types.h"
 #include "spherical_arc.h"
 #include "blendmath.h"
+#include "math_util.h"
 //KLUDGE Don't include all of emc.hh here, just hand-copy the TERM COND
 //definitions until we can break the emc constants out into a separate file.
 //#include "emc.hh"
@@ -67,6 +68,8 @@ STATIC inline double tpGetMaxTargetVel(TP_STRUCT const * const tp, TC_STRUCT con
 STATIC int tpAdjustAccelForTangent(TP_STRUCT const * const,
         TC_STRUCT * const tc,
         double normal_acc_scale);
+
+STATIC int tpHandleBlendArc(TP_STRUCT * const tp, TC_STRUCT * const tc);
 /**
  * @section tpcheck Internal state check functions.
  * These functions compartmentalize some of the messy state checks.
@@ -81,9 +84,14 @@ STATIC int tpAdjustAccelForTangent(TP_STRUCT const * const,
  */
 STATIC int tcCheckLastParabolic(TC_STRUCT * const tc,
         TC_STRUCT const * const prev_tc) {
+    if (!tc) {return TP_ERR_FAIL;}
+
     if (prev_tc && prev_tc->term_cond == TC_TERM_COND_PARABOLIC) {
-        tp_debug_print("prev segment parabolic, flagging blend_prev\n");
+        tp_debug_print("Found parabolic blend between %d and %d, flagging blend_prev\n",
+                       prev_tc->id, tc->id);
         tc->blend_prev = 1;
+    } else {
+        tc->blend_prev = 0;
     }
     return TP_ERR_OK;
 }
@@ -223,13 +231,33 @@ STATIC inline double tpGetRealTargetVel(TP_STRUCT const * const tp,
     return fmin(v_target * tpGetFeedScale(tp,tc), tpGetMaxTargetVel(tp, tc));
 }
 
+STATIC inline double getMaxFeedScale(TC_STRUCT const * tc)
+{
+    //All reasons to disable feed override go here
+    if (tc && tc->synchronized == TC_SYNC_POSITION ) {
+        return 1.0;
+    } else {
+        return emcmotConfig->maxFeedScale;
+    }
+}
+
+STATIC inline double getMaxBlendFeedScale(TC_STRUCT const * prev_tc, TC_STRUCT const * tc)
+{
+    //All reasons to disable feed override go here
+    if ((tc && tc->synchronized == TC_SYNC_POSITION) ||
+            (prev_tc && prev_tc->synchronized == TC_SYNC_POSITION)) {
+        return 1.0;
+    } else {
+        return emcmotConfig->maxFeedScale;
+    }
+}
 
 /**
  * Get the worst-case target velocity for a segment based on the trajectory planner state.
  */
 STATIC inline double tpGetMaxTargetVel(TP_STRUCT const * const tp, TC_STRUCT const * const tc)
 {
-    double max_scale = emcmotConfig->maxFeedScale;
+    double max_scale = getMaxFeedScale(tc);
     if (tc->is_blending) {
         //KLUDGE: Don't allow feed override to keep blending from overruning max velocity
         max_scale = fmin(max_scale, 1.0);
@@ -303,9 +331,14 @@ STATIC inline double tpGetScaledAccel(TP_STRUCT const * const tp,
 }
 
 /**
- * Convert the 2-part spindle position and sign to a signed double.
+ * Convert a raw spindle position into a "progress" position in the current spindle direction.
+ * In other words, how far has the spindle moved in the indicated direction?
+ *
+ * @param spindle_pos signed raw spindle position (typically from motion)
+ * @param spindle_dir commanded spindle direction
+ * @return Spindle progress, POSITIVE if the position and direction have the same sign, NEGATIVE otherwise.
  */
-STATIC inline double tpGetSignedSpindlePosition(double spindle_pos, int spindle_dir) {
+STATIC inline double getSpindleProgress(double spindle_pos, int spindle_dir) {
     if (spindle_dir < 0.0) {
         spindle_pos*=-1.0;
     }
@@ -386,7 +419,7 @@ int tpClear(TP_STRUCT * const tp)
     tp->pausing = 0;
     tp->synchronized = 0;
     tp->uu_per_rev = 0.0;
-    emcmotStatus->spindleSync = 0;
+    emcmotStatus->spindle_fb.synced = 0;
     emcmotStatus->current_vel = 0.0;
     emcmotStatus->requested_vel = 0.0;
     emcmotStatus->distance_to_go = 0.0;
@@ -418,7 +451,6 @@ int tpInit(TP_STRUCT * const tp)
     tp->wDotMax = 0.0;
 
     tp->spindle.offset = 0.0;
-    tp->spindle.revs = 0.0;
     tp->spindle.waiting_for_index = MOTION_INVALID_ID;
     tp->spindle.waiting_for_atspeed = MOTION_INVALID_ID;
 
@@ -811,7 +843,7 @@ STATIC int tpCreateLineArcBlend(TP_STRUCT * const tp, TC_STRUCT * const prev_tc,
             tc,
             &acc_bound,
             &vel_bound,
-            emcmotConfig->maxFeedScale);
+            getMaxBlendFeedScale(prev_tc, tc));
 
     if (res_init != TP_ERR_OK) {
         tp_debug_print("blend init failed with code %d, aborting blend arc\n",
@@ -930,9 +962,6 @@ STATIC int tpCreateLineArcBlend(TP_STRUCT * const tp, TC_STRUCT * const prev_tc,
 
     tp_debug_print("Passed all tests, updating segments\n");
 
-    //Cleanup any mess from parabolic
-    tc->blend_prev = 0;
-
     //TODO refactor to pass consume to connect function
     if (param.consume) {
         //Since we're consuming the previous segment, pop the last line off of the queue
@@ -974,7 +1003,7 @@ STATIC int tpCreateArcLineBlend(TP_STRUCT * const tp, TC_STRUCT * const prev_tc,
             tc,
             &acc_bound,
             &vel_bound,
-            emcmotConfig->maxFeedScale);
+            getMaxBlendFeedScale(prev_tc, tc));
     if (res_init != TP_ERR_OK) {
         tp_debug_print("blend init failed with code %d, aborting blend arc\n",
                 res_init);
@@ -1089,7 +1118,6 @@ STATIC int tpCreateArcLineBlend(TP_STRUCT * const tp, TC_STRUCT * const prev_tc,
     tcSetLineXYZ(tc, &line2_temp);
 
     //Cleanup any mess from parabolic
-    tc->blend_prev = 0;
     tcSetTermCond(prev_tc, TC_TERM_COND_TANGENT);
     return TP_ERR_OK;
 }
@@ -1124,7 +1152,7 @@ STATIC int tpCreateArcArcBlend(TP_STRUCT * const tp, TC_STRUCT * const prev_tc, 
             tc,
             &acc_bound,
             &vel_bound,
-            emcmotConfig->maxFeedScale);
+            getMaxBlendFeedScale(prev_tc, tc));
 
     if (res_init != TP_ERR_OK) {
         tp_debug_print("blend init failed with code %d, aborting blend arc\n",
@@ -1148,8 +1176,6 @@ STATIC int tpCreateArcArcBlend(TP_STRUCT * const tp, TC_STRUCT * const prev_tc, 
         tp_debug_print("aborting blend arc, arc id %d is not coplanar with binormal\n", tc->id);
         return TP_ERR_FAIL;
     }
-
-
 
     int res_param = blendComputeParameters(&param);
     int res_points = blendFindPoints3(&points_approx, &geom, &param);
@@ -1258,10 +1284,7 @@ STATIC int tpCreateArcArcBlend(TP_STRUCT * const tp, TC_STRUCT * const prev_tc, 
     tcSetCircleXYZ(prev_tc, &circ1_temp);
     tcSetCircleXYZ(tc, &circ2_temp);
 
-    //Cleanup any mess from parabolic
-    tc->blend_prev = 0;
     tcSetTermCond(prev_tc, TC_TERM_COND_TANGENT);
-
     return TP_ERR_OK;
 }
 
@@ -1287,7 +1310,7 @@ STATIC int tpCreateLineLineBlend(TP_STRUCT * const tp, TC_STRUCT * const prev_tc
             tc,
             &acc_bound,
             &vel_bound,
-            emcmotConfig->maxFeedScale);
+            getMaxBlendFeedScale(prev_tc, tc));
 
     if (res_init != TP_ERR_OK) {
         tp_debug_print("blend init failed with code %d, aborting blend arc\n",
@@ -1376,14 +1399,21 @@ STATIC inline int tpAddSegmentToQueue(TP_STRUCT * const tp, TC_STRUCT * const tc
     return TP_ERR_OK;
 }
 
-STATIC int tpCheckCanonType(TC_STRUCT * const prev_tc, TC_STRUCT const * const tc)
+STATIC int handleModeChange(TC_STRUCT * const prev_tc, TC_STRUCT const * const tc)
 {
     if (!tc || !prev_tc) {
         return TP_ERR_FAIL;
     }
     if ((prev_tc->canon_motion_type == EMC_MOTION_TYPE_TRAVERSE) ^
             (tc->canon_motion_type == EMC_MOTION_TYPE_TRAVERSE)) {
-        tp_debug_print("Can't blend between rapid and feed move, aborting arc\n");
+        tp_debug_print("Blending disabled: can't blend between rapid and feed motions\n");
+        tcSetTermCond(prev_tc, TC_TERM_COND_STOP);
+    }
+    if (prev_tc->synchronized != TC_SYNC_POSITION &&
+            tc->synchronized == TC_SYNC_POSITION) {
+        tp_debug_print("Blending disabled: changing spindle sync mode from %d to %d\n",
+                prev_tc->synchronized,
+                tc->synchronized);
         tcSetTermCond(prev_tc, TC_TERM_COND_STOP);
     }
     return TP_ERR_OK;
@@ -1398,6 +1428,46 @@ STATIC int tpSetupSyncedIO(TP_STRUCT * const tp, TC_STRUCT * const tc) {
         tc->syncdio.anychanged = 0;
         return TP_ERR_NO_ACTION;
     }
+}
+
+STATIC int tcUpdateArcLengthFit(TC_STRUCT * const tc)
+{
+    if (!tc) {return -1;}
+
+    switch (tc->motion_type) {
+    case TC_CIRCULAR:
+        findSpiralArcLengthFit(&tc->coords.circle.xyz, &tc->coords.circle.fit);
+        break;
+    case TC_LINEAR:
+    case TC_RIGIDTAP:
+    case TC_SPHERICAL:
+    default:
+        break;
+    }
+    return 0;
+}
+
+STATIC int tpFinalizeAndEnqueue(TP_STRUCT * const tp, TC_STRUCT * const tc)
+{
+    //TODO refactor this into its own function
+    TC_STRUCT *prev_tc;
+    prev_tc = tcqLast(&tp->queue);
+    handleModeChange(prev_tc, tc);
+    if (emcmotConfig->arcBlendEnable){
+        tpHandleBlendArc(tp, tc);
+        tcUpdateArcLengthFit(tc);
+    }
+    tcFlagEarlyStop(prev_tc, tc);
+    // KLUDGE order is important here, the parabolic blend check has to
+    // happen after all other steps that affect the terminal condition
+    tcCheckLastParabolic(tc, prev_tc);
+    tcFinalizeLength(prev_tc);
+
+    int retval = tpAddSegmentToQueue(tp, tc, true);
+    //Run speed optimization (will abort safely if there are no tangent segments)
+    tpRunOptimization(tp);
+
+    return retval;
 }
 
 
@@ -1451,14 +1521,7 @@ int tpAddRigidTap(TP_STRUCT * const tp, EmcPose end, double vel, double ini_maxv
     // Force exact stop mode after rigid tapping regardless of TP setting
     tcSetTermCond(&tc, TC_TERM_COND_STOP);
 
-    TC_STRUCT *prev_tc;
-    //Assume non-zero error code is failure
-    prev_tc = tcqLast(&tp->queue);
-    tcFinalizeLength(prev_tc);
-    tcFlagEarlyStop(prev_tc, &tc);
-    int retval = tpAddSegmentToQueue(tp, &tc, true);
-    tpRunOptimization(tp);
-    return retval;
+    return tpFinalizeAndEnqueue(tp, &tc);
 }
 
 STATIC blend_type_t tpCheckBlendArcType(TP_STRUCT const * const tp,
@@ -1725,8 +1788,8 @@ STATIC int tpSetupTangent(TP_STRUCT const * const tp,
 
     // Calculate instantaneous acceleration required for change in direction
     // from v1 to v2, assuming constant speed
-    double v_max1 = fmin(prev_tc->maxvel, prev_tc->reqvel * emcmotConfig->maxFeedScale);
-    double v_max2 = fmin(tc->maxvel, tc->reqvel * emcmotConfig->maxFeedScale);
+    double v_max1 = fmin(prev_tc->maxvel, prev_tc->reqvel * getMaxFeedScale(prev_tc));
+    double v_max2 = fmin(tc->maxvel, tc->reqvel * getMaxFeedScale(tc));
     double v_max = fmin(v_max1, v_max2);
     tp_debug_print("tangent v_max = %f\n",v_max);
 
@@ -1847,6 +1910,7 @@ STATIC int tpHandleBlendArc(TP_STRUCT * const tp, TC_STRUCT * const tc) {
 
     if (res_create == TP_ERR_OK) {
         //Need to do this here since the length changed
+        tcCheckLastParabolic(&blend_tc, prev_tc);
         tpAddSegmentToQueue(tp, &blend_tc, false);
     } else {
         return res_create;
@@ -1905,22 +1969,7 @@ int tpAddLine(TP_STRUCT * const tp, EmcPose end, int canon_motion_type, double v
     // For linear move, set rotary axis settings 
     tc.indexrotary = indexrotary;
 
-    //TODO refactor this into its own function
-    TC_STRUCT *prev_tc;
-    prev_tc = tcqLast(&tp->queue);
-    tpCheckCanonType(prev_tc, &tc);
-    if (emcmotConfig->arcBlendEnable){
-        tpHandleBlendArc(tp, &tc);
-    }
-    tcCheckLastParabolic(&tc, prev_tc);
-    tcFinalizeLength(prev_tc);
-    tcFlagEarlyStop(prev_tc, &tc);
-
-    int retval = tpAddSegmentToQueue(tp, &tc, true);
-    //Run speed optimization (will abort safely if there are no tangent segments)
-    tpRunOptimization(tp);
-
-    return retval;
+    return tpFinalizeAndEnqueue(tp, &tc);
 }
 
 
@@ -1997,22 +2046,7 @@ int tpAddCircle(TP_STRUCT * const tp,
             v_max_actual,
             acc);
 
-    TC_STRUCT *prev_tc;
-    prev_tc = tcqLast(&tp->queue);
-
-    tpCheckCanonType(prev_tc, &tc);
-    if (emcmotConfig->arcBlendEnable){
-        tpHandleBlendArc(tp, &tc);
-        findSpiralArcLengthFit(&tc.coords.circle.xyz, &tc.coords.circle.fit);
-    }
-    tcCheckLastParabolic(&tc, prev_tc);
-    tcFinalizeLength(prev_tc);
-    tcFlagEarlyStop(prev_tc, &tc);
-
-    int retval = tpAddSegmentToQueue(tp, &tc, true);
-
-    tpRunOptimization(tp);
-    return retval;
+    return tpFinalizeAndEnqueue(tp, &tc);
 }
 
 
@@ -2145,13 +2179,13 @@ STATIC void tpDebugCycleInfo(TP_STRUCT const * const tp, TC_STRUCT const * const
     double tc_finalvel = tpGetRealFinalVel(tp, tc, nexttc);
 
     /* Debug Output */
-    tc_debug_print("tc state: vr = %f, vf = %f, maxvel = %f\n",
+    tc_debug_print("tc state: vr = %f, vf = %f, maxvel = %f, ",
             tc_target_vel, tc_finalvel, tc->maxvel);
-    tc_debug_print("          currentvel = %f, fs = %f, tc = %f, term = %d\n",
+    tc_debug_print("currentvel = %f, fs = %f, dt = %f, term = %d, ",
             tc->currentvel, tpGetFeedScale(tp,tc), tc->cycle_time, tc->term_cond);
-    tc_debug_print("          acc = %f,T = %f, P = %f\n", acc,
+    tc_debug_print("acc = %f, T = %f, P = %f, ", acc,
             tc->target, tc->progress);
-    tc_debug_print("          motion type %d\n", tc->motion_type);
+    tc_debug_print("motion_type = %d\n", tc->motion_type);
 
     if (tc->on_final_decel) {
         rtapi_print(" on final decel\n");
@@ -2189,30 +2223,7 @@ void tpCalculateTrapezoidalAccel(TP_STRUCT const * const tp, TC_STRUCT * const t
     double dx = tc->target - tc->progress;
     double maxaccel = tpGetScaledAccel(tp, tc);
 
-    double discr_term1 = pmSq(tc_finalvel);
-    double discr_term2 = maxaccel * (2.0 * dx - tc->currentvel * tc->cycle_time);
-    double tmp_adt = maxaccel * tc->cycle_time * 0.5;
-    double discr_term3 = pmSq(tmp_adt);
-
-    double discr = discr_term1 + discr_term2 + discr_term3;
-
-    // Descriminant is a little more complicated with final velocity term. If
-    // descriminant < 0, we've overshot (or are about to). Do the best we can
-    // in this situation
-#ifdef TP_PEDANTIC
-    if (discr < 0.0) {
-        rtapi_print_msg(RTAPI_MSG_ERR,
-                "discriminant %f < 0 in velocity calculation!\n", discr);
-    }
-#endif
-    //Start with -B/2 portion of quadratic formula
-    double maxnewvel = -tmp_adt;
-
-    //If the discriminant term brings our velocity above zero, add it to the total
-    //We can ignore the calculation otherwise because negative velocities are clipped to zero
-    if (discr > discr_term3) {
-        maxnewvel += pmSqrt(discr);
-    }
+    double maxnewvel = findTrapezoidalDesiredVel(maxaccel, dx, tc_finalvel, tc->currentvel, tc->cycle_time);
 
     // Find bounded new velocity based on target velocity
     // Note that we use a separate variable later to check if we're on final decel
@@ -2291,6 +2302,54 @@ void tpToggleDIOs(TC_STRUCT * const tc) {
     }
 }
 
+//KLUDGE compine this with the version in taskintf
+static inline spindle_direction_code_t getSpindleCmdDir()
+{
+    if (emcmotStatus->spindle_cmd.velocity_rpm_out > 0.0) {
+        return SPINDLE_FORWARD;
+    } else if (emcmotStatus->spindle_cmd.velocity_rpm_out < 0.0) {
+        return SPINDLE_REVERSE;
+    } else {
+        return SPINDLE_STOPPED;
+    }
+}
+
+static inline double findSpindleDisplacement(double new_pos,
+                              double old_pos,
+                              spindle_direction_code_t spindle_cmd_dir)
+{
+    // Difference assuming spindle "forward" direction
+    double forward_diff = new_pos - old_pos;
+
+    switch(spindle_cmd_dir) {
+    case SPINDLE_STOPPED:
+    case SPINDLE_FORWARD:
+        return forward_diff;
+    case SPINDLE_REVERSE:
+        return -forward_diff;
+    }
+    //no default on purpose, compiler should warn on missing states
+    return 0;
+}
+
+/**
+ * Helper function to compare commanded and actual spindle velocity.
+ * If the signs of velocity don't match, then the spindle is reversing direction.
+ */
+static inline bool spindleReversing()
+{
+    return (signum(emcmotStatus->spindle_fb.velocity_rpm) != signum(emcmotStatus->spindle_cmd.velocity_rpm_out));
+}
+
+static inline bool cmdReverseSpindle()
+{
+    static bool reversed = false;
+    // Flip sign on commanded velocity
+    emcmotStatus->spindle_cmd.velocity_rpm_out *= -1;
+    // (Optional) set an internal flag so we know if the spindle is reversed from the user command
+    reversed = !reversed;
+    return reversed;
+}
 
 /**
  * Handle special cases for rigid tapping.
@@ -2301,26 +2360,24 @@ void tpToggleDIOs(TC_STRUCT * const tc) {
 STATIC void tpUpdateRigidTapState(TP_STRUCT const * const tp,
         TC_STRUCT * const tc) {
 
-    static double old_spindlepos;
-    double new_spindlepos = emcmotStatus->spindleRevs;
-    if (emcmotStatus->spindle.direction < 0) new_spindlepos = -new_spindlepos;
+    double spindle_pos = emcmotStatus->spindle_fb.position_rev;
 
     switch (tc->coords.rigidtap.state) {
         case TAPPING:
             tc_debug_print("TAPPING\n");
             if (tc->progress >= tc->coords.rigidtap.reversal_target) {
                 // command reversal
-                emcmotStatus->spindle.speed *= -1.0;
+                cmdReverseSpindle();
                 tc->coords.rigidtap.state = REVERSING;
             }
             break;
         case REVERSING:
             tc_debug_print("REVERSING\n");
-            if (new_spindlepos < old_spindlepos) {
+            if (!spindleReversing()) {
                 PmCartesian start, end;
                 PmCartLine *aux = &tc->coords.rigidtap.aux_xyz;
                 // we've stopped, so set a new target at the original position
-                tc->coords.rigidtap.spindlerevs_at_reversal = new_spindlepos + tp->spindle.offset;
+                tc->coords.rigidtap.spindlepos_at_reversal = spindle_pos;
 
                 pmCartLinePoint(&tc->coords.rigidtap.xyz, tc->progress, &start);
                 end = tc->coords.rigidtap.xyz.start;
@@ -2333,19 +2390,19 @@ STATIC void tpUpdateRigidTapState(TP_STRUCT const * const tp,
 
                 tc->coords.rigidtap.state = RETRACTION;
             }
-            old_spindlepos = new_spindlepos;
-            tc_debug_print("Spindlepos = %f\n", new_spindlepos);
+            tc_debug_print("Spindlepos = %f\n", spindle_pos);
             break;
         case RETRACTION:
             tc_debug_print("RETRACTION\n");
             if (tc->progress >= tc->coords.rigidtap.reversal_target) {
-                emcmotStatus->spindle.speed *= -1;
+                // Flip spindle direction againt to start final reversal
+                cmdReverseSpindle();
                 tc->coords.rigidtap.state = FINAL_REVERSAL;
             }
             break;
         case FINAL_REVERSAL:
             tc_debug_print("FINAL_REVERSAL\n");
-            if (new_spindlepos > old_spindlepos) {
+            if (!spindleReversing()) {
                 PmCartesian start, end;
                 PmCartLine *aux = &tc->coords.rigidtap.aux_xyz;
                 pmCartLinePoint(aux, tc->progress, &start);
@@ -2359,7 +2416,6 @@ STATIC void tpUpdateRigidTapState(TP_STRUCT const * const tp,
 
                 tc->coords.rigidtap.state = FINAL_PLACEMENT;
             }
-            old_spindlepos = new_spindlepos;
             break;
         case FINAL_PLACEMENT:
             tc_debug_print("FINAL_PLACEMENT\n");
@@ -2493,7 +2549,7 @@ STATIC int tpCompleteSegment(TP_STRUCT * const tp,
     // spindle position so the next synced move can be in
     // the right place.
     if(tc->synchronized != TC_SYNC_NONE) {
-        tp->spindle.offset += tc->target / tc->uu_per_rev;
+        tp->spindle.offset += (tc->target - tc->progress_at_sync) / tc->uu_per_rev;
     } else {
         tp->spindle.offset = 0.0;
     }
@@ -2542,7 +2598,7 @@ STATIC int tpHandleAbort(TP_STRUCT * const tp, TC_STRUCT * const tc,
         tp->synchronized = 0;
         tp->spindle.waiting_for_index = MOTION_INVALID_ID;
         tp->spindle.waiting_for_atspeed = MOTION_INVALID_ID;
-        emcmotStatus->spindleSync = 0;
+        emcmotStatus->spindle_fb.synced = 0;
         tpResume(tp);
         return TP_ERR_STOPPED;
     }  //FIXME consistent error codes
@@ -2587,15 +2643,14 @@ STATIC int tpCheckAtSpeed(TP_STRUCT * const tp, TC_STRUCT * const tc)
     }
 
     if (MOTION_ID_VALID(tp->spindle.waiting_for_index)) {
-        if (emcmotStatus->spindle_index_enable) {
+        if (emcmotStatus->spindle_fb.index_enable) {
             /* haven't passed index yet */
             return TP_ERR_WAITING;
         } else {
             /* passed index, start the move */
-            emcmotStatus->spindleSync = 1;
+            emcmotStatus->spindle_fb.synced = 1;
             tp->spindle.waiting_for_index = MOTION_INVALID_ID;
             tc->sync_accel = 1;
-            tp->spindle.revs = 0;
         }
     }
 
@@ -2643,7 +2698,7 @@ STATIC int tpActivateSegment(TP_STRUCT * const tp, TC_STRUCT * const tc) {
 
     // Do at speed checks that only happen once
     int needs_atspeed = tc->atspeed ||
-        (tc->synchronized == TC_SYNC_POSITION && !(emcmotStatus->spindleSync));
+        (tc->synchronized == TC_SYNC_POSITION && !(emcmotStatus->spindle_fb.synced));
 
     if ( needs_atspeed && !(emcmotStatus->spindle_is_atspeed)) {
         tp->spindle.waiting_for_atspeed = tc->id;
@@ -2659,13 +2714,14 @@ STATIC int tpActivateSegment(TP_STRUCT * const tp, TC_STRUCT * const tc) {
             return TP_ERR_WAITING;
     }
 
-    // Temporary debug message
-    tp_debug_print("Activate tc id = %d target_vel = %f req_vel = %f final_vel = %f length = %f\n",
+    tp_debug_print("Activate tc id = %d target_vel = %f req_vel = %f final_vel = %f length = %f max_acc = %f term_cond = %d\n",
             tc->id,
             tc->target_vel,
             tc->reqvel,
             tc->finalvel,
-            tc->target);
+            tc->target,
+            tc->maxaccel,
+            tc->term_cond);
 
     tc->active = 1;
     //Do not change initial velocity here, since tangent blending already sets this up
@@ -2673,12 +2729,12 @@ STATIC int tpActivateSegment(TP_STRUCT * const tp, TC_STRUCT * const tc) {
     tc->blending_next = 0;
     tc->on_final_decel = 0;
 
-    if (TC_SYNC_POSITION == tc->synchronized && !(emcmotStatus->spindleSync)) {
-        tp_debug_print("Setting up position sync\n");
+    if (TC_SYNC_POSITION == tc->synchronized && !(emcmotStatus->spindle_fb.synced)) {
+        tp_debug_print(" Setting up position sync\n");
         // if we aren't already synced, wait
         tp->spindle.waiting_for_index = tc->id;
         // ask for an index reset
-        emcmotStatus->spindle_index_enable = 1;
+        emcmotStatus->spindle_fb.index_enable = 1;
         tp->spindle.offset = 0.0;
         rtapi_print_msg(RTAPI_MSG_DBG, "Waiting on sync...\n");
         return TP_ERR_WAITING;
@@ -2693,7 +2749,7 @@ STATIC int tpActivateSegment(TP_STRUCT * const tp, TC_STRUCT * const tc) {
  * Update requested velocity to follow the spindle's velocity (scaled by feed rate).
  */
 STATIC void tpSyncVelocityMode(TP_STRUCT * const tp, TC_STRUCT * const tc, TC_STRUCT const * nexttc) {
-    double speed = emcmotStatus->spindleSpeedIn;
+    double speed = emcmotStatus->spindle_fb.velocity_rpm;
     double pos_error = fabs(speed) * tc->uu_per_rev;
     // Account for movement due to parabolic blending with next segment
     if(nexttc) {
@@ -2710,38 +2766,38 @@ STATIC void tpSyncVelocityMode(TP_STRUCT * const tp, TC_STRUCT * const tc, TC_ST
 STATIC void tpSyncPositionMode(TP_STRUCT * const tp, TC_STRUCT * const tc,
         TC_STRUCT * const nexttc ) {
 
-    double spindle_pos = tpGetSignedSpindlePosition(emcmotStatus->spindleRevs,
-            emcmotStatus->spindle.direction);
-    tp_debug_print("Spindle at %f\n",spindle_pos);
-    double spindle_vel, target_vel;
-    double oldrevs = tp->spindle.revs;
+    // Start with raw spindle position and our saved offset
+    double spindle_pos = emcmotStatus->spindle_fb.position_rev;
 
+    // If we're backing out of a hole during rigid tapping, our spindle "displacement" is
+    // measured relative to spindle position at the bottom of the hole.
+    // Otherwise, we use the stored spindle offset.
+    double local_spindle_offset = tp->spindle.offset;
     if ((tc->motion_type == TC_RIGIDTAP) && (tc->coords.rigidtap.state == RETRACTION ||
                 tc->coords.rigidtap.state == FINAL_REVERSAL)) {
-            tp->spindle.revs = tc->coords.rigidtap.spindlerevs_at_reversal -
-                spindle_pos;
-    } else {
-        tp->spindle.revs = spindle_pos;
+        local_spindle_offset = tc->coords.rigidtap.spindlepos_at_reversal;
     }
 
-    double pos_desired = (tp->spindle.revs - tp->spindle.offset) * tc->uu_per_rev;
-    double pos_error = pos_desired - tc->progress;
+    // Note that this quantity should be non-negative under normal conditions.
+    double spindle_displacement = findSpindleDisplacement(spindle_pos,
+                                               local_spindle_offset,
+                                               getSpindleCmdDir());
 
-    if(nexttc) {
-        pos_error -= nexttc->progress;
-    }
+    tc_debug_print("spindle_displacement %f raw_pos %f", spindle_displacement, spindle_pos);
 
+    const double spindle_vel = emcmotStatus->spindle_fb.velocity_rpm / 60.0;
     if(tc->sync_accel) {
         // detect when velocities match, and move the target accordingly.
         // acceleration will abruptly stop and we will be on our new target.
         // FIX: this is driven by TP cycle time, not the segment cycle time
-        double dt = fmax(tp->cycleTime, TP_TIME_EPSILON);
-        spindle_vel = tp->spindle.revs / ( dt * tc->sync_accel++);
-        target_vel = spindle_vel * tc->uu_per_rev;
+        // Experiment: try syncing with averaged spindle speed
+        double target_vel = spindle_vel * tc->uu_per_rev;
         if(tc->currentvel >= target_vel) {
             tc_debug_print("Hit accel target in pos sync\n");
             // move target so as to drive pos_error to 0 next cycle
-            tp->spindle.offset = tp->spindle.revs - tc->progress / tc->uu_per_rev;
+            tp->spindle.offset = spindle_pos;
+            tc->progress_at_sync = tc->progress;
+            tc_debug_print("Spindle offset %f\n", tp->spindle.offset);
             tc->sync_accel = 0;
             tc->target_vel = target_vel;
         } else {
@@ -2750,17 +2806,78 @@ STATIC void tpSyncPositionMode(TP_STRUCT * const tp, TC_STRUCT * const tc,
             tc->target_vel = tc->maxvel;
         }
     } else {
+        // Multiply by user feed rate to get equivalent desired position
+        double pos_desired = spindle_displacement * tc->uu_per_rev;
+        double pos_error = pos_desired - (tc->progress - tc->progress_at_sync);
+        tc_debug_print(" pos_desired %f, progress %f", pos_desired, tc->progress);
+
+        if(nexttc) {
+            // If we're in a parabolic blend, the next segment will be active too,
+            // so make sure to account for its progress
+            tc_debug_print(" nexttc_progress %f", nexttc->progress);
+            pos_error -= nexttc->progress;
+        }
+        tc_debug_print(", pos_error %f\n", pos_error);
+
         // we have synced the beginning of the move as best we can -
         // track position (minimize pos_error).
-        tc_debug_print("tracking in pos_sync\n");
-        double errorvel;
-        spindle_vel = (tp->spindle.revs - oldrevs) / tp->cycleTime;
-        target_vel = spindle_vel * tc->uu_per_rev;
-        errorvel = pmSqrt(fabs(pos_error) * tpGetScaledAccel(tp,tc));
-        if(pos_error<0) {
-            errorvel *= -1.0;
+        // This is the velocity we should be at when the position error is c0
+        double v_final = spindle_vel * tc->uu_per_rev;
+
+        /*
+         * Correct for position errors when tracking spindle motion.
+         * This approach assumes that if position error is 0, the correct
+         * velocity is just the nominal target velocity. If the position error
+         * is non-zero, however, then we need to correct it, but then return to
+         * the nominal velocity.
+         *
+         * velocity
+         * |          v_p
+         * |         /\
+         * |        /..\         v_0
+         * |--------....-----------
+         * |        ....
+         * |        ....
+         * |_________________________
+         *         |----| t      time
+         *
+         * To correct a position error x_err (shaded area above), we need to
+         * momentarily increase the velocity, then decrease back to the nonimal
+         * velocity.
+         *
+         * In effect, this is the trapezoidal velocity planning problem, if:
+         * 1) remaining distance dx = x_err
+         * 2) "final" velocity = v_0
+         * 3) max velocity / acceleration from motion segment
+         */
+        double a_max = tpGetScaledAccel(tp, tc) * emcmotStatus->spindle_tracking_gain;
+        double v_max = tc->maxvel;
+
+        switch(emcmotStatus->pos_tracking_mode) {
+        case 2:
+        {
+            double v_sq_alt = pmSq(v_final) + pos_error * a_max;
+            double v_target_alt = pmSqrt(fmax(v_sq_alt, 0.0));
+            tc->target_vel = v_target_alt;
+            break;
         }
-        tc->target_vel = target_vel + errorvel;
+        case 1:
+        {
+            double v_sq = a_max * pos_error;
+            double v_target_stock = signum(v_sq) * pmSqrt(fabs(v_sq)) + v_final;
+            tc->target_vel = v_target_stock;
+            break;
+        }
+        case 0:
+        default:
+        {
+            double v_target_trapz = fmin(findTrapezoidalDesiredVel(a_max, pos_error, v_final, tc->currentvel, tc->cycle_time), v_max);
+            tc->target_vel = v_target_trapz;
+            break;
+        }
+        }
+
+        tc_debug_print("in position sync, target_vel = %f, ideal_vel = %f, vel_err = %f\n", tc->target_vel, v_final, v_final - tc->target_vel);
     }
 
     //Finally, clip requested velocity at zero
@@ -3179,18 +3296,18 @@ int tpRunCycle(TP_STRUCT * const tp, long period)
      * spindle motion.*/
     switch (tc->synchronized) {
         case TC_SYNC_NONE:
-            emcmotStatus->spindleSync = 0;
+            emcmotStatus->spindle_fb.synced = 0;
             break;
         case TC_SYNC_VELOCITY:
-            tp_debug_print("sync velocity\n");
+            tc_debug_print("sync velocity\n");
             tpSyncVelocityMode(tp, tc, nexttc);
             break;
         case TC_SYNC_POSITION:
-            tp_debug_print("sync position\n");
+            tc_debug_print("sync position\n");
             tpSyncPositionMode(tp, tc, nexttc);
             break;
         default:
-            tp_debug_print("unrecognized spindle sync state!\n");
+            tc_debug_print("unrecognized spindle sync state!\n");
             break;
     }
 

@@ -1,0 +1,4 @@
+#!/bin/sh
+# If test-ui.py succeeds, then test succeeds
+exit 0
+

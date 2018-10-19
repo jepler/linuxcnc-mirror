@@ -77,7 +77,6 @@ typedef enum {
  */
 typedef struct {
      double offset;
-     double revs;
      int waiting_for_index;
      int waiting_for_atspeed;
 } tp_spindle_t;

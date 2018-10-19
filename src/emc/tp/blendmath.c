@@ -1824,3 +1824,29 @@ double pmCircleEffectiveMinRadius(PmCircle const * const circle)
             effective_radius);
     return effective_radius;
 }
+
+double findTrapezoidalDesiredVel(double a_max,
+                                 double dx,
+                                 double v_final,
+                                 double v_current,
+                                 double cycle_time)
+{
+    double dt = fmax(cycle_time, TP_TIME_EPSILON);
+    // Discriminant is 3 terms (when final velocity is non-zero)
+    double discr_term1 = pmSq(v_final);
+    double discr_term2 = a_max * (2.0 * dx - v_current * dt);
+    double tmp_adt = a_max * dt * 0.5;
+    double discr_term3 = pmSq(tmp_adt);
+    double discr = discr_term1 + discr_term2 + discr_term3;
+
+    //Start with -B/2 portion of quadratic formula
+    double maxnewvel = -tmp_adt;
+
+    //If the discriminant term brings our velocity above zero, add it to the total
+    //We can ignore the calculation otherwise because negative velocities are clipped to zero
+    if (discr > discr_term3) {
+        maxnewvel += pmSqrt(discr);
+    }
+
+    return maxnewvel;
+}

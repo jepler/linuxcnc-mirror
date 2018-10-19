@@ -148,6 +148,12 @@ int findAccelScale(PmCartesian const * const acc,
         PmCartesian const * const bounds,
         PmCartesian * const scale);
 
+double findTrapezoidalDesiredVel(double a_max,
+                              double dx,
+                              double v_final,
+                              double currentvel,
+                              double cycle_time);
+
 int pmCartCartParallel(PmCartesian const * const v1,
         PmCartesian const * const v2, double tol);
 

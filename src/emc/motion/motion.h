@@ -544,17 +544,21 @@ Suggestion: Split this in to an Error and a Status flag register..
 	double big_vel;		/* used for "debouncing" velocity */
     } emcmot_joint_t;
 
-/* This structure contains only the "status" data associated with
-   a joint.  "Status" data is that data that should be reported to
-   user space on a continuous basis.  An array of these structs is
-   part of the main status structure, and is filled in with data
-   copied from the emcmot_joint_t structs every servo period.
+typedef enum {
+    SPINDLE_REVERSE=-1,
+    SPINDLE_STOPPED=0,
+    SPINDLE_FORWARD=1
+} spindle_direction_code_t;
 
-   For now this struct contains more data than it really needs, but
-   paring it down will take time (and probably needs to be done one
-   or two items at a time, with much testing).  My main goal right
-   now is to get get the large joint struct out of status.
-
+/**
+ * This structure contains only the "status" data associated with a joint.
+ * "Status" data is that data that should be reported to user space on a
+ * continuous basis.  An array of these structs is part of the main status
+ * structure, and is filled in with data copied from the emcmot_joint_t structs
+ * every servo period.  For now this struct contains more data than it really
+ * needs, but paring it down will take time (and probably needs to be done one
+ * or two items at a time, with much testing).  My main goal right now is to
+ * get get the large joint struct out of status.
 */
     typedef struct {
 
@@ -580,16 +584,21 @@ Suggestion: Split this in to an Error and a Status flag register..
 
 
     typedef struct {
-	double speed;		// spindle speed in RPMs
+    double velocity_rpm_out;
 	double css_factor;
 	double xoffset;
-	int direction;		// 0 stopped, 1 forward, -1 reverse
 	int brake;		// 0 released, 1 engaged
 	int locked;             // spindle lock engaged after orient
 	int orient_fault;       // fault code from motion.spindle-orient-fault
 	int orient_state;       // orient_state_t
-    } spindle_status;
+    } spindle_cmd_status;
     
+    typedef struct {
+    double position_rev;
+    double velocity_rpm;
+    int index_enable;  /* hooked to a canon encoder index-enable */
+    int synced;        /* we are doing spindle-synced motion */
+    } spindle_fb_status;
 
 /*********************************
         STATUS STRUCTURE
@@ -647,12 +656,11 @@ Suggestion: Split this in to an Error and a Status flag register..
         unsigned char probe_type;
 	EmcPose probedPos;	/* Axis positions stored as soon as possible
 				   after last probeTripped */
-        int spindle_index_enable;  /* hooked to a canon encoder index-enable */
-        int spindleSync;        /* we are doing spindle-synced motion */
-        double spindleRevs;     /* position of spindle in revolutions */
-        double spindleSpeedIn;  /* velocity of spindle in revolutions per minute */
 
-	spindle_status spindle;	/* data types for spindle status */
+	spindle_cmd_status spindle_cmd;	/* Spindle command output from motion */
+	spindle_fb_status spindle_fb;	/* Spindle feedback input to motion */
+    double spindle_tracking_gain; // external control of position trakcing aggressiveness
+    int pos_tracking_mode;
 	
 	int synch_di[EMCMOT_MAX_DIO]; /* inputs to the motion controller, queried by g-code */
 	int synch_do[EMCMOT_MAX_DIO]; /* outputs to the motion controller, queried by g-code */

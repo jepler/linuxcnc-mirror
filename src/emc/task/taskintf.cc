@@ -1395,7 +1395,7 @@ int emcSpindleAbort(void)
 int emcSpindleSpeed(double speed, double css_factor, double offset)
 {
 
-    if (emcmotStatus.spindle.speed == 0)
+    if (emcmotStatus.spindle_cmd.velocity_rpm_out == 0)
 	return 0; //spindle stopped, not updating speed
 
     return emcSpindleOn(speed, css_factor, offset);
@@ -1505,12 +1505,21 @@ int emcMotionUpdate(EMC_MOTION_STAT * stat)
     stat->echo_serial_number = localMotionEchoSerialNumber;
     stat->debug = emcmotConfig.debug;
     
-    stat->spindle.enabled = emcmotStatus.spindle.speed != 0;
-    stat->spindle.speed = emcmotStatus.spindle.speed;
-    stat->spindle.brake = emcmotStatus.spindle.brake;
-    stat->spindle.direction = emcmotStatus.spindle.direction;
-    stat->spindle.orient_state = emcmotStatus.spindle.orient_state;
-    stat->spindle.orient_fault = emcmotStatus.spindle.orient_fault;
+    stat->spindle.enabled = emcmotStatus.spindle_cmd.velocity_rpm_out != 0;
+    stat->spindle.speed = emcmotStatus.spindle_cmd.velocity_rpm_out;
+    stat->spindle.brake = emcmotStatus.spindle_cmd.brake;
+
+    // Report spindle direction based on commanded velocity
+    if (stat->spindle.speed > 0.0) {
+        stat->spindle.direction = SPINDLE_FORWARD;
+    } else if (stat->spindle.speed < 0.0){
+        stat->spindle.direction = SPINDLE_REVERSE;
+    } else {
+        stat->spindle.direction = SPINDLE_STOPPED;
+    }
+
+    stat->spindle.orient_state = emcmotStatus.spindle_cmd.orient_state;
+    stat->spindle.orient_fault = emcmotStatus.spindle_cmd.orient_fault;
 
     for (dio = 0; dio < EMC_MAX_DIO; dio++) {
 	stat->synch_di[dio] = emcmotStatus.synch_di[dio];

@@ -1,0 +1,3 @@
+net Zvel => python-ui.Zvel
+net spindle-rpm-est => python-ui.spindle-speed
+net running halui.program.is-running => python-ui.running

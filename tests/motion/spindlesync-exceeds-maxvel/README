@@ -1,0 +1,7 @@
+In a spindle-synched G33 move, it is possible to specify a feed per
+revolution and spindle speed that requires linear motion exceeding
+axis velocity limits.  This test sets up this kind of condition and
+measures actual pitch during the motion, failing if pitch is not
+within an epsilon value.
+
+[1]: https://github.com/LinuxCNC/linuxcnc/issues/167
