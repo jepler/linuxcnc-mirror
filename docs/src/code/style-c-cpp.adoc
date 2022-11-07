@@ -1,0 +1,321 @@
+:lang: en
+:toc:
+
+= C/C++ Coding Standards
+
+Most of this style guide has been copied wholesale from the Linux kernel
+documents - See linux/Documentation/CodingStyle for the full text.
+The C++ recommendations have been drawn from various sources such as the
+GTK headers, "C++ The Complete Reference" by Schildt, and IRC discussions.
+
+== Tab Stops
+
+A tab stop always corresponds to 8 spaces. Do not write code that
+displays correctly only with a differing tab stop setting.
+
+== Indentation
+
+Use 4 spaces per level of indentation. Combining 8 spaces into one tab
+is acceptable but not required.
+
+Rationale: The whole idea behind indentation is to clearly define where
+a block of control starts and ends.  Especially when you've been looking
+at your screen for 20 straight hours, you'll find it a lot easier to see
+how the indentation works if you have large indentations.
+
+Now, some people will claim that having 8-character indentations makes
+the code move too far to the right, and makes it hard to read on a
+80-character terminal screen. Whilst the GNU style of 2-character
+indentations reduces the clarity. For EMC2, a compromise of 4-character
+indentation has been chosen. This still spreads the code out and causes
+lines to wrap round leading to difficulties in reading the sources. The
+answer to that is that if you need more than 3 levels of indentation, you're
+screwed anyway, and should fix your program.
+
+== Placing Braces
+
+The other issue that always comes up in C styling is the placement of
+braces.  Unlike the indent size, there are few technical reasons to
+choose one placement strategy over the other, but the preferred way, as
+shown to us by the prophets Kernighan and Ritchie, is to put the opening
+brace last on the line, and put the closing brace first, thusly:
+
+[source,c]
+----
+if (x is true) {
+    we do y
+}
+----
+
+However, there is one special case, namely functions: they have the
+opening brace at the beginning of the next line, thus:
+
+[source,c]
+----
+int function(int x)
+{
+    body of function
+}
+----
+
+Note that the closing brace is empty on a line of its own, _except_ in
+the cases where it is followed by a continuation of the same statement,
+i.e. a "while" in a do-statement or an "else" in an if-statement, like
+this:
+
+[source,c]
+----
+do {
+    body of do-loop
+} while (condition);
+----
+
+and
+
+[source,c]
+----
+if (x == y) {
+    ..
+} else if (x > y) {
+    ...
+} else {
+    ....
+}
+----
+Also, note that this brace-placement also minimizes the number of empty
+(or almost empty) lines, without any loss of readability.  Thus, as the
+supply of new-lines on your screen is not a renewable resource (think
+25-line terminal screens here), you have more empty lines to put
+comments on.
+
+== Naming
+
+C is a Spartan language, and so should your naming be. Unlike Modula-2
+and Pascal programmers, C programmers do not use cute names like
+ThisVariableIsATemporaryCounter. A C programmer would call that
+variable 'tmp', which is much easier to write, and not the least more
+difficult to understand.
+
+However, descriptive names for global variables are a must. To call a
+global function 'foo' is a shooting offense.
+
+GLOBAL variables (to be used only if you *really*  need them) need to
+have descriptive names, as do global functions. If
+you have a function that counts the number of active users, you should
+ call that 'count_active_users()' or similar, you should *not* call it
+'cntusr()'.
+
+Encoding the type of a function into the name (so-called Hungarian
+notation) is brain damaged - the compiler knows the types anyway and
+can check those, and it only confuses the programmer. No wonder
+Microsoft makes buggy programs.
+
+LOCAL variable names should be short, and to the point. If you have
+some random integer loop counter, it should probably be called 'i'.
+Calling it 'loop_counter' is non-productive, if there is no chance of
+it being misunderstood. Similarly, 'tmp' can be just about any type of
+variable that is used to hold a temporary value.
+
+If you are afraid to mix up your local variable names, you have
+another problem, which is called the function-growth-hormone-imbalance
+syndrome. See next chapter.
+
+== Functions
+
+Functions should be short and sweet, and do just one thing. They
+should fit on one or two screenfuls of text (the ISO/ANSI screen size
+is 80x24, as we all know), and do one thing and do that well.
+
+The maximum length of a function is inversely proportional to the
+complexity and indentation level of that function. So, if you have a
+conceptually simple function that is just one long (but simple)
+case-statement, where you have to do lots of small things for a lot of
+different cases, it's OK to have a longer function.
+
+However, if you have a complex function, and you suspect that a
+less-than-gifted first-year high-school student might not even
+understand what the function is all about, you should adhere to the
+maximum limits all the more closely. Use helper functions with
+descriptive names (you can ask the compiler to in-line them if you
+think it's performance-critical, and it will probably do a better job
+of it that you would have done).
+
+Another measure of the function is the number of local variables. They
+shouldn't exceed 5-10, or you're doing something wrong. Re-think the
+function, and split it into smaller pieces. A human brain can generally
+easily keep track of about 7 different things, anything more and it
+gets confused. You know you're brilliant, but maybe you'd like to
+understand what you did 2 weeks from now.
+
+== Commenting
+
+Comments are good, but there is also a danger of over-commenting.
+NEVER try to explain HOW your code works in a comment: it's much better
+to write the code so that the *working* is obvious, and it's a waste of
+time to explain badly written code.
+
+Generally, you want your comments to tell WHAT your code does, not
+HOW. A boxed comment describing the function, return value, and who
+calls it placed above the body is good. Also, try to avoid putting
+comments inside a function body: if the function is so complex that you
+need to separately comment parts of it, you should probably re-read the
+Functions section again. You can make small comments to note or warn
+about something particularly clever (or ugly), but try to avoid excess.
+Instead, put the comments at the head of the function, telling people
+what it does, and possibly WHY it does it.
+
+If comments along the lines of /* Fix me */ are used, please, please,
+say why something needs fixing. When a change has been made to the
+affected portion of code, either remove the comment, or amend it to
+indicate a change has been made and needs testing.
+
+== Shell Scripts & Makefiles
+
+Not everyone has the same tools and packages installed. Some people
+use vi, others emacs - A few even avoid having either package
+installed, preferring a lightweight text editor such as nano or the one
+built in to Midnight Commander.
+
+gawk versus mawk - Again, not everyone will have gawk installed, mawk
+is nearly a tenth of the size and yet conforms to the POSIX AWK
+standard. If some obscure gawk specific command is needed that mawk
+does not provide, than the script will break for some users. The same
+would apply to mawk. In short, use the generic awk invocation in
+preference to gawk or mawk.
+
+== C++ Conventions
+
+C++ coding styles are always likely to end up in heated debates (a bit
+like the emacs versus vi arguments). One thing is certain however, a
+common style used by everyone working on a project leads to uniform and
+readable code.
+
+Naming conventions: Constants either from #defines or enumerations
+should be in upper case through out. Rationale: Makes it easier to spot
+compile time constants in the source code, e.g., EMC_MESSAGE_TYPE.
+
+Classes and Namespaces should capitalize the first letter of each word
+and avoid underscores. Rationale: Identifies classes, constructors and
+destructors, e.g., GtkWidget.
+
+Methods (or function names) should follow the C recommendations above
+and should not include the class name. Rationale: Maintains a common
+style across C and C++ sources, e.g., get_foo_bar().
+
+However, boolean methods are easier to read if they avoid underscores
+and use an 'is' prefix (not to be confused with methods that manipulate
+a boolean). Rationale: Identifies the return value as TRUE or FALSE and
+nothing else, e.g., isOpen, isHomed.
+
+Do NOT use 'Not' in a boolean name, it leads only leads to confusion
+when doing logical tests, e.g., isNotOnLimit or is_not_on_limit are BAD.
+
+Variable names should avoid the use of upper case and underscores
+except for local or private names. The use of global variables should
+be avoided as much as possible. Rationale: Clarifies which are
+variables and which are methods. Public: e.g., axislimit Private: e.g.,
+maxvelocity_ .
+
+.Specific method naming conventions
+
+The terms get and set should be used where an attribute is accessed
+directly. Rationale: Indicates the purpose of the function or method,
+e.g., get_foo set_bar.
+
+For methods involving boolean attributes, set & reset is preferred.
+Rationale: As above. e.g. set_amp_enable reset_amp_fault
+
+Math intensive methods should use compute as a prefix. Rationale:
+Shows that it is computationally intensive and will hog the CPU. e.g.
+compute_PID
+
+Abbreviations in names should be avoided where possible - The
+exception is for local variable names. Rationale: Clarity of code. e.g.
+pointer is preferred over ptr compute is preferred over cmp compare is
+again preferred over cmp.
+
+Enumerates and other constants can be prefixed by a common type name,
+e.g., `enum COLOR { COLOR_RED, COLOR_BLUE };` .
+
+Excessive use of macros and defines should be avoided - Using simple
+methods or functions is preferred. Rationale: Improves the debugging
+process.
+
+Include Statements Header files must be included at the top of a
+source file and not scattered throughout the body. They should be
+sorted and grouped by their hierarchical position within the system
+with the low level files included first. Include file paths should
+NEVER be absolute - Use the compiler -I flag instead to extend the search
+path. Rationale: Headers may not be in the same place on all systems.
+
+Pointers and references should have their reference symbol next to the
+variable name rather than the type name. Rationale: Reduces confusion,
+e.g., `float *x` or `int &i`.
+
+Implicit tests for zero should not be used except for boolean
+variables, e.g., `if (spindle_speed != 0)` NOT `if (spindle_speed)`.
+
+Only loop control statements must be included in a for() construct,
+e.g.
+
+[source,c]
+----
+sum = 0;
+for (i = 0; i < 10; i++) {
+    sum += value[i];
+}
+----
+
+NOT:
+
+[source,c]
+----
+for (i = 0, sum = 0; i < 10; i++) {
+    sum += value[i];
+}
+----
+
+Likewise, executable statements in conditionals must be avoided, e.g.,
+`if (fd = open(file_name))` is bad.
+
+Complex conditional statements should be avoided - Introduce temporary
+boolean variables instead.
+
+The form `while(true)`` should be used for infinite loops.
+e.g.
+
+[source,c]
+----
+while (true) {
+    ...;
+}
+----
+
+NOT
+
+[source,c]
+----
+for (;;) {
+    ...;
+}
+----
+
+or
+
+[source,c]
+----
+while (1) {
+    ...;
+}
+----
+
+Parentheses should be used in plenty in mathematical expressions - Do
+not rely on operator precedence when an extra parentheses would clarify
+things.
+
+File names: C++ sources and headers use .cc and .hh extension. The use
+of .c and .h are reserved for plain C. Headers are for class, method,
+and structure declarations, not code (unless the functions are declared
+inline).
+
+// vim: set syntax=asciidoc:

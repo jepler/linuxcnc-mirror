@@ -1,0 +1,12 @@
+:lang: en
+:toc:
+
+= Python Coding Standards
+
+Use the http://www.python.org/dev/peps/pep-0008/[PEP 8] style for
+Python code.
+
+[NOTE]
+To be done, experience and help very welcome !
+
+// vim: set syntax=asciidoc:

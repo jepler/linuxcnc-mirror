@@ -1,0 +1,13 @@
+:lang: en
+:toc:
+
+= Translations
+
+All program code and documentation is written in US English.
+
+All translations are performed with the help of the
+link:https://hosted.weblate.org/projects/linuxcnc/[weblate] services.
+The source tree then maintains the .po files in sync with that online
+representation.
+
+Our users and developers are kindly asked to help with the translation.

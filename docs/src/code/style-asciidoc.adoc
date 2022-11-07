@@ -1,0 +1,297 @@
+:lang: en
+:toc:
+
+= AsciiDoc Coding Standards
+
+This is a very recent (09/2022) part of this document. Please help shaping
+it if you are familiar with asciidoc.
+
+// After looking at the website, and maybe watching the one or other YouTube Video, the
+// LinuxCNC documentation is likely the first point of contact for any new
+// user. The talent to get the documentation right is mostly disjunct from
+// computationally orchestrating all the moving parts of a mill or lathe,
+// though. Still, we need this to shine if we want LinuxCNC to shine and
+// for a transfer of our knowledge for the next generation - this seems
+// fair to say for a project that was started in the last millennium and few
+// individuals buying their own mills/lathes before their hair turns gray.
+
+// not really related to the style guide IMHO
+// == Overall structure of documentation
+
+// There are two basic documents, i.e. the
+//  * Users' Guide and the
+//  * Developers' Guide
+
+// All documents created belong to either of these "parental documents"
+// and are included from the respective document, either directly or that
+// included file includes it.
+
+
+== Preamble, TOC, Anchors etc.
+
+Every file should start with a header. This is typically
+
+----
+:lang: en
+----
+
+and longer documents may also chose to set
+
+----
+:toc:
+----
+
+This should be followed by an anchor for that section or chapter that is
+represented in that file like
+
+----
+[[cha:<file-title>]]
+----
+
+// For a better consistency, and maintainability, the anchors need to be the same for all langages.
+// If the page needs extras, e.g. for the syntax-highlighting, then such lines may then follow.
+
+//.Anchors for titles and other blocks
+
+If a chapter/section header shall be granted the option to be
+referenced from another part of the documentation then it needs an anchor.
+The anchor shall be a combination of an indicator of the kind
+of block that is referenced (cha, sec, fig ,tab, ...) together with a
+short name identifying the object.
+
+
+//  * index entries for titles and other blocks
+
+//    ?
+
+== Heading/Title Capitalization
+
+The documentation prefers the "Title Case Capitalization". It is defined by several associations. Here the definition by the APA:
+
+.Title Case Capitalization
+[quote, APA, 'link:https://apastyle.apa.org/style-grammar-guidelines/capitalization/title-case[]']
+____
+
+In title case, major words are capitalized, and most minor words are lowercase. [...]
+
+- *major words*: Nouns, verbs (including linking verbs), adjectives, adverbs, pronouns, and all words of four letters or more are considered major words.
+- *minor words*: Short (i.e., three letters or fewer) conjunctions, short prepositions, and all articles are considered minor words.
+
+____
+
+// === Lists
+
+// I think we should not define whether we should have a dot at the end of list items or not
+
+== Sections and Subsections
+
+The depth of sections shall not exceed 3 levels. If more structure is needed,
+subheadings can be inserted like this:
+----
+= Chapter
+== Section
+=== Subsection
+.Subheading
+----
+While "Chapter" corresponds to the document's title.
+
+
+
+== Usage of Italic and Monospace Font
+
+Highlighting of special elements like component names, pin names etc. shall be italic.
+Short code snippets shall be in monospaecd font.
+Headings shall not be formatted either itlaic nor monospaced.
+
+.Example
+====
+----
+If you are using _component_a_ you have to set the use `parameter_x = 500.0`.
+----
+
+If you are using _component_a_ you have to set the use `parameter_x = 500.0`.
+
+If you have direction control of your spindle, then the HAL pins _spindle.N.forward_ and _spindle.N.reverse_ are controlled by the G-codes _M3_ and _M4_.
+====
+
+
+== Values and Units
+
+Between a value and its unit shall be always a space, preferably a thin space (U+2009). +
+To enter Unicode characters in most graphical editors,
+
+1. press and hold the Left Ctrl and Shift keys and hit the u key and then
+2. type the Unicode code with Ctrl + Shift still pressed.
+
+In VIM, press Ctrl + v and then enter the Unicode code with prefixed "u".
+
+
+== Code Blocks
+
+Asciidoc supports syntax highlighting for several languages.
+The most common used in LinuxCNC are: _c, python, sh, tcl, xml_. +
+They are used like this:
+----
+ [source,c]
+ ----
+ // some code
+ ----
+----
+It also exists some LinuxCNC-specific syntax highlighting
+for _hal, ini, ngc_. +
+To use those, following lines need to be inserted:
+----
+// these attributes must come after the document title, to work around a bug in asciidoc 8.6.6
+:ini: {basebackend@docbook:'':ini}
+:hal: {basebackend@docbook:'':hal}
+:ngc: {basebackend@docbook:'':ngc}
+----
+
+The keywords for those need to be surrounded by curly braces:
+----
+ [source,{ini}]
+ ----
+ // some code
+ ----
+----
+
+
+== Pin Listings
+
+.Compact Form
+
+----
+* **comp.group.**_N_**.pin** '(type, direction)' - Functional description
+----
+
+Example:
+====
+* **halui.joint.**_N_**.select** '(bit, in)' - Pin for selecting joint N
+* **halui.joint.**_N_**.is-selected** '(bit, out)' - Status pin that joint N is selected
+* **halui.joint.**_N_**.has-fault** '(bit, out)' - Status pin telling that joint N has a fault
+====
+Where _N_ is the instance number of the component. If it's a component/module that can only be loaded once, a zero could/should replace _N_.
+
+.Indented Form with Line Break
+----
+* **comp.group.**_N_**.pin** '(type, direction)':: Functional description
+----
+
+Example:
+====
+**pid.**_N_**.Pgain** '(float, in)':: Proportional gain. Results in a contribution to the output that is the error multiplied by Pgain.
+
+**pid.**_N_**.Igain** '(float, in)':: Integral gain. Results in a contribution to the output that is the integral of the error multiplied by Igain. For example an error of 0.02 that lasted 10 seconds would result in an integrated error (`errorI`) of 0.2, and if Igain is 20, the integral term would add 4.0 to the output.
+
+**pid.**_N_**.Dgain** '(float, in)':: Derivative gain. Results in a contribution to the output that is the rate of change (derivative) of the error multiplied by Dgain. For example an error that changed from 0.02 to 0.03 over 0.2 seconds would result in an error derivative (errorD) of of 0.05, and if Dgain is 5, the derivative term would add 0.25 to the output.
+====
+
+== Listings of Commands/Messages
+
+.Panelui
+====
+.*home_selected*
+* required argument: axis number (int)
+
+.*unhome_selected*
+* required argument: axis number (int)
+
+.*override_limits*
+
+.*spindle_forward_adjust*
+* optional argument: starting RPM (int) - default 100
+* Description: If the spindle is stopped it will start in the forward direction.
+  If it is already running it will increase or decrease the rpm depending on
+  what direction the spindle is running in.
+
+.*spindle_forward*
+* optional argument: starting RPM (int) - default 100
+
+====
+
+
+.GStat
+====
+*motion-mode-changed* :: '(returns integer)' -
+Sent when motion's mode has changed
+
+*spindle-control-changed* :: '(returns integer, bool, integer, bool)' -
+(spindle num, spindle on state, requested spindle direction & rate, at-speed state) +
+Sent when spindle direction or running status changes or at-speed changes.
+
+*current-feed-rate* :: '(returns float)' -
+Sent when the current feed rate changes.
+
+*current-x-rel-position* :: '(returns float)' -
+Sent every 100ms.
+
+*current-position* :: '(returns pyobject, pyobject, pyobject, pyobject)' -
+Sent every 100ms. +
+returns tuples of position, relative position, distance-to-go and +
+the joint actual position. Before homing, on multi-joint axes, only joint +
+position is valid.
+====
+
+// === ??
+// * usage of lists vs titles +
+// ?
+
+// * use of bold and italic
+// * structure/page splitting guidance
+//   - avoid 2k+ char long lines
+
+
+== Images
+
+- Shall be centered
+- Shall have a caption if not embedded in the text
+----
+.Caption
+image::image.png["Description",align="center"]
+----
+
+
+== Table Formatting (to be filled by smoe 😉)
+Tables can be presented with a series of options.
+
+- header +
+With the header-option set, the fist line will be interpreted accordingly.
+
+- column width +
+in ideal column, the column is constituted only by its data. No
+vertical separators should be required. The horizontal alignment will
+also not be required since the writing itself is horizontal enough.
++
+If individual fields have too much text then a line-break within that
+field should be provoked.
+
+- what lines are visible +
+As motivated above, there should be no grid lines.
+The top and bottom lines should separate the table from the surrounding text.
+Another line could be motivated between the header and the main body.
+
+- captions +
+Asciidoc makes it difficult to nicely prepare captions. At the same time,
+captions are the only bit of the whole document that even with the first flick
+through the document will not escape the reader's attention.
+
+- spaces between ? for po4a
+
+----
+Instruction needs to be added
+----
+
+
+== ?
+- reference
+* figure formatting (captions)
+  - reference
+  - caption
+    ----
+    Instruction needs to be added
+    ----
+* footnotes
+* comments
+* interaction with other media like videos
+
+// vim: set syntax=asciidoc:

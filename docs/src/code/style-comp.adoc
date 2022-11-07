@@ -1,0 +1,16 @@
+:lang: en
+:toc:
+
+= Comp Coding Standards
+
+// FIXME "Comp" "HAL Comp" "Component" "HAL Component" ?
+
+In the declaration portion of a .comp file, begin each declaration at
+the first column. Insert extra blank lines when they help group related
+items.
+
+In the code portion of a .comp file, follow normal C coding style.
+
+// TODO Complete at least with commented example !
+
+// vim: set syntax=asciidoc:
