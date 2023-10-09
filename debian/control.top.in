@@ -11,7 +11,7 @@ Build-Depends:
     @MODUTILS_DEPENDS@,
     @EXTRA_BUILD@,
     docbook-xsl <!nodocs>,
-    asciidoc <!nodocs>,
+    asciidoc,
     ghostscript <!nodocs>,
     groff-base <!nodocs>,
     imagemagick <!nodocs>,
