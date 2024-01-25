@@ -891,7 +891,7 @@ check_stuff ( "before command_handler()" );
                 issue_atspeed = 1;
                 emcmotStatus->atspeed_next_feed = 0;
             }
-            if(!is_feed_type(emcmotCommand->motion_type) && emcmotStatus->spindle.css_factor) {
+            if(!is_feed_type(emcmotCommand->motion_type) && emcmotStatus->spindle_cmd.css_factor) {
                 emcmotStatus->atspeed_next_feed = 1;
             }
 	    /* append it to the emcmotDebug->tp */
@@ -899,7 +899,8 @@ check_stuff ( "before command_handler()" );
         int res_addline = tpAddLine(&emcmotDebug->tp, emcmotCommand->pos, emcmotCommand->motion_type, 
                                 emcmotCommand->vel, emcmotCommand->ini_maxvel, 
                                 emcmotCommand->acc, emcmotStatus->enables_new, issue_atspeed,
-                                emcmotCommand->turn);
+                                emcmotCommand->turn,
+                                emcmotCommand->pure_angular);
         //KLUDGE ignore zero length line
         if (res_addline < 0) {
             reportError(_("can't add linear move at line %d, error code %d"),
@@ -953,10 +954,11 @@ check_stuff ( "before command_handler()" );
 	    /* append it to the emcmotDebug->tp */
 	    tpSetId(&emcmotDebug->tp, emcmotCommand->id);
 	    int res_addcircle = tpAddCircle(&emcmotDebug->tp, emcmotCommand->pos,
-                            emcmotCommand->center, emcmotCommand->normal,
-                            emcmotCommand->turn, emcmotCommand->motion_type,
-                            emcmotCommand->vel, emcmotCommand->ini_maxvel,
-                            emcmotCommand->acc, emcmotStatus->enables_new, issue_atspeed);
+                emcmotCommand->center, emcmotCommand->normal,
+                emcmotCommand->turn, emcmotCommand->motion_type,
+                emcmotCommand->vel, emcmotCommand->ini_maxvel,
+                emcmotCommand->acc, emcmotCommand->acc_normal,
+                emcmotStatus->enables_new, issue_atspeed);
         if (res_addcircle < 0) {
             reportError(_("can't add circular move at line %d, error code %d"),
                     emcmotCommand->id, res_addcircle);
@@ -1026,9 +1028,9 @@ check_stuff ( "before command_handler()" );
 	    /* set the max acceleration */
 	    /* can do it at any time */
 	    rtapi_print_msg(RTAPI_MSG_DBG, "SET_ACCEL");
-	    emcmotStatus->acc = emcmotCommand->acc;
-	    tpSetAmax(&emcmotDebug->tp, emcmotStatus->acc);
-	    break;
+        emcmotStatus->acc = emcmotCommand->acc;
+        // WARNING has no effect on coordinated motion TP, only single-axis planner
+        break;
 
 	case EMCMOT_PAUSE:
 	    /* pause the motion */
@@ -1394,7 +1396,11 @@ check_stuff ( "before command_handler()" );
 
 	    /* append it to the emcmotDebug->tp */
 	    tpSetId(&emcmotDebug->tp, emcmotCommand->id);
-	    if (-1 == tpAddLine(&emcmotDebug->tp, emcmotCommand->pos, emcmotCommand->motion_type, emcmotCommand->vel, emcmotCommand->ini_maxvel, emcmotCommand->acc, emcmotStatus->enables_new, 0, -1)) {
+	    if (-1 == tpAddLine(&emcmotDebug->tp, emcmotCommand->pos,
+				emcmotCommand->motion_type, emcmotCommand->vel,
+				emcmotCommand->ini_maxvel, emcmotCommand->acc,
+				emcmotStatus->enables_new, 0, -1,
+                emcmotCommand->pure_angular)) {
 		reportError(_("can't add probe move"));
 		emcmotStatus->commandStatus = EMCMOT_COMMAND_BAD_EXEC;
 		tpAbort(&emcmotDebug->tp);
@@ -1522,7 +1528,7 @@ check_stuff ( "before command_handler()" );
 		rtapi_print_msg(RTAPI_MSG_DBG, "spindle-locked cleared by SPINDLE_ON");
 	    *(emcmot_hal_data->spindle_locked) = 0;
 	    *(emcmot_hal_data->spindle_orient) = 0;
-	    emcmotStatus->spindle.orient_state = EMCMOT_ORIENT_NONE;
+        emcmotStatus->spindle_cmd.orient_state = EMCMOT_ORIENT_NONE;
 
 	    /* if (emcmotStatus->spindle.orient) { */
 	    /* 	reportError(_("cant turn on spindle during orient in progress")); */
@@ -1530,30 +1536,24 @@ check_stuff ( "before command_handler()" );
 	    /* 	tpAbort(&emcmotDebug->tp); */
 	    /* 	SET_MOTION_ERROR_FLAG(1); */
 	    /* } else { */
-	    emcmotStatus->spindle.speed = emcmotCommand->vel;
-	    emcmotStatus->spindle.css_factor = emcmotCommand->ini_maxvel;
-	    emcmotStatus->spindle.xoffset = emcmotCommand->acc;
-	    if (emcmotCommand->vel >= 0) {
-		emcmotStatus->spindle.direction = 1;
-	    } else {
-		emcmotStatus->spindle.direction = -1;
-	    }
-	    emcmotStatus->spindle.brake = 0; //disengage brake
+        emcmotStatus->spindle_cmd.velocity_rpm_out = emcmotCommand->spindle_speed;
+        emcmotStatus->spindle_cmd.css_factor = emcmotCommand->css_factor;
+        emcmotStatus->spindle_cmd.xoffset = emcmotCommand->css_xoffset;
+        emcmotStatus->spindle_cmd.brake = 0; //disengage brake
 	    emcmotStatus->atspeed_next_feed = 1;
 	    break;
 
 	case EMCMOT_SPINDLE_OFF:
 	    rtapi_print_msg(RTAPI_MSG_DBG, "SPINDLE_OFF");
-	    emcmotStatus->spindle.speed = 0;
-	    emcmotStatus->spindle.direction = 0;
-	    emcmotStatus->spindle.brake = 1; // engage brake
+        emcmotStatus->spindle_cmd.velocity_rpm_out = 0;
+        emcmotStatus->spindle_cmd.brake = 1; // engage brake
 	    if (*(emcmot_hal_data->spindle_orient))
 		rtapi_print_msg(RTAPI_MSG_DBG, "SPINDLE_ORIENT cancelled by SPINDLE_OFF");
 	    if (*(emcmot_hal_data->spindle_locked))
 		rtapi_print_msg(RTAPI_MSG_DBG, "spindle-locked cleared by SPINDLE_OFF");
 	    *(emcmot_hal_data->spindle_locked) = 0;
 	    *(emcmot_hal_data->spindle_orient) = 0;
-	    emcmotStatus->spindle.orient_state = EMCMOT_ORIENT_NONE;
+        emcmotStatus->spindle_cmd.orient_state = EMCMOT_ORIENT_NONE;
 	    break;
 
 	case EMCMOT_SPINDLE_ORIENT:
@@ -1567,11 +1567,10 @@ check_stuff ( "before command_handler()" );
 		/* tpAbort(&emcmotDebug->tp); */
 		/* SET_MOTION_ERROR_FLAG(1); */
 	    }
-	    emcmotStatus->spindle.orient_state = EMCMOT_ORIENT_IN_PROGRESS;
-	    emcmotStatus->spindle.speed = 0;
-	    emcmotStatus->spindle.direction = 0;
+        emcmotStatus->spindle_cmd.orient_state = EMCMOT_ORIENT_IN_PROGRESS;
+        emcmotStatus->spindle_cmd.velocity_rpm_out = 0;
 	    // so far like spindle stop, except opening brake
-	    emcmotStatus->spindle.brake = 0; // open brake
+        emcmotStatus->spindle_cmd.brake = 0; // open brake
 
 	    *(emcmot_hal_data->spindle_orient_angle) = emcmotCommand->orientation;
 	    *(emcmot_hal_data->spindle_orient_mode) = emcmotCommand->mode;
@@ -1579,38 +1578,37 @@ check_stuff ( "before command_handler()" );
 	    *(emcmot_hal_data->spindle_orient) = 1;
 
 	    // mirror in spindle status
-	    emcmotStatus->spindle.orient_fault = 0; // this pin read during spindle-orient == 1 
-	    emcmotStatus->spindle.locked = 0;
+        emcmotStatus->spindle_cmd.orient_fault = 0; // this pin read during spindle-orient == 1
+        emcmotStatus->spindle_cmd.locked = 0;
 	    break;
 
 	case EMCMOT_SPINDLE_INCREASE:
 	    rtapi_print_msg(RTAPI_MSG_DBG, "SPINDLE_INCREASE");
-	    if (emcmotStatus->spindle.speed > 0) {
-		emcmotStatus->spindle.speed += 100; //FIXME - make the step a HAL parameter
-	    } else if (emcmotStatus->spindle.speed < 0) {
-		emcmotStatus->spindle.speed -= 100;
+        if (emcmotStatus->spindle_cmd.velocity_rpm_out > 0) {
+        emcmotStatus->spindle_cmd.velocity_rpm_out += 100; //FIXME - make the step a HAL parameter
+        } else if (emcmotStatus->spindle_cmd.velocity_rpm_out < 0) {
+        emcmotStatus->spindle_cmd.velocity_rpm_out -= 100;
 	    }
 	    break;
 
 	case EMCMOT_SPINDLE_DECREASE:
 	    rtapi_print_msg(RTAPI_MSG_DBG, "SPINDLE_DECREASE");
-	    if (emcmotStatus->spindle.speed > 100) {
-		emcmotStatus->spindle.speed -= 100; //FIXME - make the step a HAL parameter
-	    } else if (emcmotStatus->spindle.speed < -100) {
-		emcmotStatus->spindle.speed += 100;
+        if (emcmotStatus->spindle_cmd.velocity_rpm_out > 100) {
+        emcmotStatus->spindle_cmd.velocity_rpm_out -= 100; //FIXME - make the step a HAL parameter
+        } else if (emcmotStatus->spindle_cmd.velocity_rpm_out < -100) {
+        emcmotStatus->spindle_cmd.velocity_rpm_out += 100;
 	    }
 	    break;
 
 	case EMCMOT_SPINDLE_BRAKE_ENGAGE:
 	    rtapi_print_msg(RTAPI_MSG_DBG, "SPINDLE_BRAKE_ENGAGE");
-	    emcmotStatus->spindle.speed = 0;
-	    emcmotStatus->spindle.direction = 0;
-	    emcmotStatus->spindle.brake = 1;
+        emcmotStatus->spindle_cmd.velocity_rpm_out = 0;
+        emcmotStatus->spindle_cmd.brake = 1;
 	    break;
 
 	case EMCMOT_SPINDLE_BRAKE_RELEASE:
 	    rtapi_print_msg(RTAPI_MSG_DBG, "SPINDLE_BRAKE_RELEASE");
-	    emcmotStatus->spindle.brake = 0;
+        emcmotStatus->spindle_cmd.brake = 0;
 	    break;
 
 	case EMCMOT_SET_JOINT_COMP:
@@ -1648,26 +1646,32 @@ check_stuff ( "before command_handler()" );
 	    joint->comp.entries++;
 	    break;
 
-        case EMCMOT_SET_OFFSET:
-            emcmotStatus->tool_offset = emcmotCommand->tool_offset;
-            break;
+    case EMCMOT_SET_OFFSET:
+        emcmotStatus->tool_offset = emcmotCommand->tool_offset;
+        break;
 
-	default:
-	    rtapi_print_msg(RTAPI_MSG_DBG, "UNKNOWN");
-	    reportError(_("unrecognized command %d"), emcmotCommand->command);
-	    emcmotStatus->commandStatus = EMCMOT_COMMAND_UNKNOWN_COMMAND;
-	    break;
-        case EMCMOT_SET_MAX_FEED_OVERRIDE:
-            emcmotConfig->maxFeedScale = emcmotCommand->maxFeedScale;
-            break;
-        case EMCMOT_SETUP_ARC_BLENDS:
-            emcmotConfig->arcBlendEnable = emcmotCommand->arcBlendEnable;
-            emcmotConfig->arcBlendFallbackEnable = emcmotCommand->arcBlendFallbackEnable;
-            emcmotConfig->arcBlendOptDepth = emcmotCommand->arcBlendOptDepth;
-            emcmotConfig->arcBlendGapCycles = emcmotCommand->arcBlendGapCycles;
-            emcmotConfig->arcBlendRampFreq = emcmotCommand->arcBlendRampFreq;
-            emcmotConfig->arcBlendTangentKinkRatio = emcmotCommand->arcBlendTangentKinkRatio;
-            break;
+    case EMCMOT_SET_MAX_FEED_OVERRIDE:
+        emcmotConfig->maxFeedScale = emcmotCommand->maxFeedScale;
+        break;
+
+    case EMCMOT_SETUP_ARC_BLENDS:
+        emcmotConfig->arcBlendEnable = emcmotCommand->arcBlendEnable;
+        emcmotConfig->arcBlendFallbackEnable = emcmotCommand->arcBlendFallbackEnable;
+        emcmotConfig->arcBlendOptDepth = emcmotCommand->arcBlendOptDepth;
+        emcmotConfig->arcBlendGapCycles = emcmotCommand->arcBlendGapCycles;
+        emcmotConfig->arcBlendRampFreq = emcmotCommand->arcBlendRampFreq;
+        emcmotConfig->arcBlendTangentKinkRatio = emcmotCommand->arcBlendTangentKinkRatio;
+        break;
+
+    case EMCMOT_SETUP_CONSISTENCY_CHECKS:
+        emcmotConfig->consistencyCheckConfig = emcmotCommand->consistencyCheckConfig;
+        break;
+
+    default:
+        rtapi_print_msg(RTAPI_MSG_DBG, "UNKNOWN");
+        reportError(_("unrecognized command %d"), emcmotCommand->command);
+        emcmotStatus->commandStatus = EMCMOT_COMMAND_UNKNOWN_COMMAND;
+        break;
 
 	}			/* end of: command switch */
 	if (emcmotStatus->commandStatus != EMCMOT_COMMAND_OK) {

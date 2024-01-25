@@ -29,6 +29,8 @@ void emcPoseZero(EmcPose * const pos);
 int emcPoseAdd(EmcPose const * const p1, EmcPose const * const p2, EmcPose * const out);
 int emcPoseSub(EmcPose const * const p1, EmcPose const * const p2, EmcPose * const out);
 
+int emcPoseMultScalar(EmcPose * const p1, double m);
+
 int emcPoseToPmCartesian(EmcPose const * const pose,
         PmCartesian * const xyz, PmCartesian * const abc, PmCartesian * const uvw);
 int pmCartesianToEmcPose(PmCartesian const * const xyz,
@@ -46,6 +48,8 @@ int emcPoseGetABC(EmcPose const * const pose, PmCartesian * const abc);
 int emcPoseGetUVW(EmcPose const * const pose, PmCartesian * const uvw);
 
 int emcPoseMagnitude(EmcPose const * const pose, double * const out);
+
+unsigned int findAbsThresholdViolations(EmcPose vec, double threshold);
 
 int emcPoseValid(EmcPose const * const pose);
 

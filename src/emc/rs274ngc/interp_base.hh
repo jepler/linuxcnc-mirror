@@ -15,6 +15,8 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+#ifndef INTERP_BASE_HH
+#define INTERP_BASE_HH
 #include <stdlib.h>
 
 /* Size of certain arrays */
@@ -56,3 +58,5 @@ public:
 
 InterpBase *interp_from_shlib(const char *shlib);
 extern "C" InterpBase *makeInterp();
+
+#endif

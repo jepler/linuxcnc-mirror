@@ -49,8 +49,10 @@ typedef enum {
 #define TC_OPTIM_UNTOUCHED 0
 #define TC_OPTIM_AT_MAX 1
 
-#define TC_ACCEL_TRAPZ 0
-#define TC_ACCEL_RAMP 1
+typedef enum {
+    TC_ACCEL_TRAPZ,
+    TC_ACCEL_RAMP,
+} TCAccelMode;
 
 /**
  * Spiral arc length approximation by quadratic fit.
@@ -100,6 +102,12 @@ typedef struct {
     double aios[EMCMOT_MAX_AIO];
 } syncdio_t;
 
+
+typedef struct {
+    double position; //!< Reference position for displacement calculations
+    double direction; //!< Direction of "positive" spindle motion (as -1, 1, or 0)
+} spindle_origin_t;
+
 typedef struct {
     PmCartLine xyz;             // original, but elongated, move down
     PmCartLine aux_xyz;         // this will be generated on the fly, for the other
@@ -107,7 +115,6 @@ typedef struct {
     PmCartesian abc;
     PmCartesian uvw;
     double reversal_target;
-    double spindlerevs_at_reversal;
     RIGIDTAP_STATE state;
 } PmRigidTap;
 
@@ -117,6 +124,7 @@ typedef struct {
     double target;          // actual segment length
     double progress;        // where are we in the segment?  0..target
     double nominal_length;
+    double progress_at_sync;     // When did we sync up with the spindle?
 
     //Velocity
     double reqvel;          // vel requested by F word, calc'd by task
@@ -132,6 +140,7 @@ typedef struct {
     //Acceleration
     double maxaccel;        // accel calc'd by task
     double acc_ratio_tan;// ratio between normal and tangential accel
+    double acc_normal_max;         // Max acceleration allowed in normal direction (worst-case for the whole curve)
     
     int id;                 // segment's serial number
 
@@ -142,19 +151,19 @@ typedef struct {
         Arc9 arc;
     } coords;
 
-    int motion_type;       // TC_LINEAR (coords.line) or
+    tc_motion_type_t motion_type;       // TC_LINEAR (coords.line) or
                             // TC_CIRCULAR (coords.circle) or
                             // TC_RIGIDTAP (coords.rigidtap)
     int active;            // this motion is being executed
     int canon_motion_type;  // this motion is due to which canon function?
-    int term_cond;          // gcode requests continuous feed at the end of
+    tc_term_cond_t term_cond;          // gcode requests continuous feed at the end of
                             // this segment (g64 mode)
 
     int blending_next;      // segment is being blended into following segment
     double blend_vel;       // velocity below which we should start blending
     double tolerance;       // during the blend at the end of this move,
                             // stay within this distance from the path.
-    int synchronized;       // spindle sync state
+    tc_spindle_sync_t synchronized;       // spindle sync state
     double uu_per_rev;      // for sync, user units per rev (e.g. 0.0625 for 16tpi)
     double vel_at_blend_start;
     int sync_accel;         // we're accelerating up to sync with the spindle

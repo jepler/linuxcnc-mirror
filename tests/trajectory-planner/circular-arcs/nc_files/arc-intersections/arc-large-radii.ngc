@@ -1,0 +1,13 @@
+o<default_inch> call
+G64 P0 Q0
+F1000
+G0 X0 Y0
+Z0
+G1 X1
+G2 X2 R1
+G2 X3 R2
+G1 X4
+G1 Y2
+X0
+Y0
+M2

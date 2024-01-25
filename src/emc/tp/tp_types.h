@@ -37,7 +37,7 @@
 /* "neighborhood" size (if two values differ by less than the epsilon,
  * then they are effectively equal.)*/
 #define TP_ACCEL_EPSILON 1e-4
-#define TP_VEL_EPSILON   1e-8
+#define TP_VEL_EPSILON   DOUBLE_FUZZ
 #define TP_POS_EPSILON   1e-12
 #define TP_TIME_EPSILON  1e-12
 #define TP_ANGLE_EPSILON 1e-6
@@ -77,8 +77,8 @@ typedef enum {
  * synchronized motion code.
  */
 typedef struct {
-     double offset;
-     double revs;
+    spindle_origin_t origin; //!< initial position of spindle during synchronization (direction-aware)
+
      int waiting_for_index;
      int waiting_for_atspeed;
 } tp_spindle_t;
@@ -94,6 +94,7 @@ typedef struct {
 
     EmcPose currentPos;
     EmcPose goalPos;
+    EmcPose currentVel;
 
     int queueSize;
     double cycleTime;
@@ -104,16 +105,11 @@ typedef struct {
                                    subsequent moves */
     double vLimit;		/* absolute upper limit on all vels */
 
-    double aMax;        /* max accel (unused) */
-    //FIXME this shouldn't be a separate limit,
-    double aMaxCartesian; /* max cartesian acceleration by machine bounds */
-    double aLimit;        /* max accel (unused) */
-
     double wMax;		/* rotational velocity max */
     double wDotMax;		/* rotational accelleration max */
     int nextId;
     int execId;
-    int termCond;
+    tc_term_cond_t termCond;
     int done;
     int depth;			/* number of total queued motions */
     int activeDepth;		/* number of motions blending */
@@ -123,13 +119,17 @@ typedef struct {
     double tolerance;           /* for subsequent motions, stay within this
                                    distance of the programmed path during
                                    blends */
-    int synchronized;       // spindle sync required for this move
+    tc_spindle_sync_t synchronized;       // spindle sync required for this move
     int velocity_mode; 	        /* TRUE if spindle sync is in velocity mode,
 				   FALSE if in position mode */
     double uu_per_rev;          /* user units per spindle revolution */
 
 
     syncdio_t syncdio; //record tpSetDout's here
+
+    double time_elapsed_sec; // Total elapsed TP run time in seconds
+    long long time_elapsed_ticks; // Total elapsed TP run time in cycles (ticks)
+    long long time_at_wait; // Time when TP started to wait for spindle
 
 } TP_STRUCT;
 

@@ -112,6 +112,10 @@ int main(int argc, char **argv) {
 #define GREATEST_STDOUT stdout
 #endif
 
+#ifndef GREATEST_STDERR
+#define GREATEST_STDERR stderr
+#endif
+
 /* Remove GREATEST_ prefix from most commonly used symbols? */
 #ifndef GREATEST_USE_ABBREVS
 #define GREATEST_USE_ABBREVS 1
@@ -144,7 +148,7 @@ int main(int argc, char **argv) {
 /* Floating point type, for ASSERT_IN_RANGE. */
 #ifndef GREATEST_FLOAT
 #define GREATEST_FLOAT double
-#define GREATEST_FLOAT_FMT "%g"
+#define GREATEST_FLOAT_FMT "%0.17g"
 #endif
 
 /* Size of buffer for test name + optional '_' separator and suffix */
@@ -487,11 +491,15 @@ typedef enum greatest_test_res {
     do {                                                                \
         greatest_info.assertions++;                                     \
         if ((EXP) != (GOT)) {                                           \
-            GREATEST_FPRINTF(GREATEST_STDOUT, "\nExpected: ");          \
-            GREATEST_FPRINTF(GREATEST_STDOUT, FMT, EXP);                \
-            GREATEST_FPRINTF(GREATEST_STDOUT, "\n     Got: ");          \
-            GREATEST_FPRINTF(GREATEST_STDOUT, FMT, GOT);                \
-            GREATEST_FPRINTF(GREATEST_STDOUT, "\n");                    \
+            GREATEST_FPRINTF(GREATEST_STDERR,                           \
+                __FILE__ ":%u: In %s:\n",                               \
+                __LINE__, greatest_info.name_buf);                      \
+            GREATEST_FPRINTF(GREATEST_STDERR,                           \
+                __FILE__ ":%u: expected " FMT                           \
+                ", got " FMT "\n",                                      \
+                __LINE__,                                               \
+                EXP,                                                    \
+                GOT);                                                   \
             GREATEST_FAILm(MSG);                                        \
         }                                                               \
     } while (0)
@@ -503,9 +511,13 @@ typedef enum greatest_test_res {
         int greatest_GOT = (int)(GOT);                                  \
         greatest_enum_str_fun *greatest_ENUM_STR = ENUM_STR;            \
         if (greatest_EXP != greatest_GOT) {                             \
-            GREATEST_FPRINTF(GREATEST_STDOUT, "\nExpected: %s",         \
-                greatest_ENUM_STR(greatest_EXP));                       \
-            GREATEST_FPRINTF(GREATEST_STDOUT, "\n     Got: %s\n",       \
+            GREATEST_FPRINTF(GREATEST_STDERR,                           \
+                __FILE__ ":%u: In %s:\n",                               \
+                __LINE__, greatest_info.name_buf);                      \
+            GREATEST_FPRINTF(GREATEST_STDERR,                           \
+                __FILE__ ":%u: expected %s, got %s\n",                  \
+                __LINE__,                                               \
+                greatest_ENUM_STR(greatest_EXP),                        \
                 greatest_ENUM_STR(greatest_GOT));                       \
             GREATEST_FAILm(MSG);                                        \
         }                                                               \
@@ -522,12 +534,19 @@ typedef enum greatest_test_res {
                 greatest_EXP - greatest_GOT > greatest_TOL) ||          \
             (greatest_EXP < greatest_GOT &&                             \
                 greatest_GOT - greatest_EXP > greatest_TOL)) {          \
-            GREATEST_FPRINTF(GREATEST_STDOUT,                           \
-                "\nExpected: " GREATEST_FLOAT_FMT                       \
+            GREATEST_FPRINTF(GREATEST_STDERR,                           \
+                __FILE__ ":%u: In %s:\n",                               \
+                __LINE__, greatest_info.name_buf);                      \
+            GREATEST_FPRINTF(GREATEST_STDERR,                           \
+                __FILE__ ":%u: expected " GREATEST_FLOAT_FMT            \
                 " +/- " GREATEST_FLOAT_FMT                              \
-                "\n     Got: " GREATEST_FLOAT_FMT                       \
-                "\n",                                                   \
-                greatest_EXP, greatest_TOL, greatest_GOT);              \
+                ", got " GREATEST_FLOAT_FMT                             \
+                ", difference " GREATEST_FLOAT_FMT "\n",                \
+                __LINE__,                                               \
+                greatest_EXP,                                           \
+                greatest_TOL,                                           \
+                greatest_GOT,                                           \
+                greatest_EXP-greatest_GOT);                             \
             GREATEST_FAILm(MSG);                                        \
         }                                                               \
     } while (0)
@@ -759,24 +778,17 @@ static void greatest_do_pass(void) {                                    \
                                                                         \
 static void greatest_do_fail(void) {                                    \
     struct greatest_run_info *g = &greatest_info;                       \
-    if (GREATEST_IS_VERBOSE()) {                                        \
-        GREATEST_FPRINTF(GREATEST_STDOUT,                               \
-            "%s:%u: error: test %s failed: %s",                                    \
+        GREATEST_FPRINTF(GREATEST_STDERR,                               \
+            "%s:%u: error: %s failed: %s\n",                              \
             g->fail_file, g->fail_line,                                 \
             g->name_buf,                                                \
             g->msg ? g->msg : "");                                      \
+    if (GREATEST_IS_VERBOSE()) {                                        \
+        GREATEST_FPRINTF(GREATEST_STDOUT, "FAIL %s: %s",                \
+            g->name_buf, g->msg ? g->msg : "");                         \
     } else {                                                            \
         GREATEST_FPRINTF(GREATEST_STDOUT, "F");                         \
         g->col++;  /* add linebreak if in line of '.'s */               \
-        if (g->col != 0) {                                              \
-            GREATEST_FPRINTF(GREATEST_STDOUT, "\n");                    \
-            g->col = 0;                                                 \
-        }                                                               \
-        GREATEST_FPRINTF(GREATEST_STDOUT,                               \
-            "%s:%u: error: test %s failed: %s",                                    \
-            g->fail_file, g->fail_line,                                 \
-            g->name_buf,                                                \
-            g->msg ? g->msg : "");                                      \
     }                                                                   \
     g->suite.failed++;                                                  \
 }                                                                       \
@@ -1183,6 +1195,7 @@ greatest_run_info greatest_info
 #define ASSERT_FALSE   GREATEST_ASSERT_FALSE
 #define ASSERT_EQ      GREATEST_ASSERT_EQ
 #define ASSERT_EQ_FMT  GREATEST_ASSERT_EQ_FMT
+#define ASSERT_FLOAT_EQ(EXP, GOT) GREATEST_ASSERT_IN_RANGE(EXP, GOT, 1e-17)
 #define ASSERT_IN_RANGE GREATEST_ASSERT_IN_RANGE
 #define ASSERT_EQUAL_T GREATEST_ASSERT_EQUAL_T
 #define ASSERT_STR_EQ  GREATEST_ASSERT_STR_EQ
@@ -1209,6 +1222,14 @@ greatest_run_info greatest_info
 #define CHECK_CALL     GREATEST_CHECK_CALL
 #define SHUFFLE_TESTS  GREATEST_SHUFFLE_TESTS
 #define SHUFFLE_SUITES GREATEST_SHUFFLE_SUITES
+
+// Customized for LinuxCNC
+#define ASSERT_PMCARTESIAN_IN_RANGE(EXP, GOT, tol) do { \
+    ASSERT_IN_RANGE(EXP.x, GOT.x, tol); \
+    ASSERT_IN_RANGE(EXP.y, GOT.y, tol); \
+    ASSERT_IN_RANGE(EXP.z, GOT.z, tol); \
+} while (0)
+
 
 #ifdef GREATEST_VA_ARGS
 #define RUN_TESTp      GREATEST_RUN_TESTp

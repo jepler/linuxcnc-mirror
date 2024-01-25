@@ -1515,6 +1515,7 @@ void EMC_TRAJ_LINEAR_MOVE::update(CMS * cms)
     cms->update(acc);
     cms->update(feed_mode);
     cms->update(indexrotary);
+    cms->update(pure_angular);
 }
 
 /*
@@ -1536,6 +1537,7 @@ void EMC_TRAJ_CIRCULAR_MOVE::update(CMS * cms)
     cms->update(vel);
     cms->update(ini_maxvel);
     cms->update(acc);
+    cms->update(acc_normal);
     cms->update(feed_mode);
 
 }
@@ -2818,6 +2820,7 @@ void EMC_TRAJ_PROBE::update(CMS * cms)
     cms->update(vel);
     cms->update(ini_maxvel);
     cms->update(acc);
+    cms->update(pure_angular);
     cms->update(probe_type);
 }
 

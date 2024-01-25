@@ -1,5 +1,5 @@
-(Adjustment)
-G20 G90
+(Test blend behavior due to alternating long and short moves)
+o<default_inch> call
 G64 P0 Q0.005
 F1000
 G0 X0 Y0 Z0

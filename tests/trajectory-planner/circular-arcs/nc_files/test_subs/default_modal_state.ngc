@@ -1,0 +1,19 @@
+o<default_modal_state> sub
+G10 L2 P0 R0 (Clear any coordinate system rotation)
+G17 
+G20
+G40 (clear cutter compensation)
+G49 (cancel tool length compensation)
+G54 (Start in G54 work offset)
+G64 P0 Q0 (Blend mode with no tolerance applied)
+G90 (Absolute positioning)
+G92.1 (Reset G92 offsets)
+G94 (Feed-per-minute mode)
+G97 (RPM spindle mode)
+G98 (Return to the initial value)
+
+M5 (Turn off spindle)
+M9 (Turn off coolant)
+S0
+F0
+o<default_modal_state> endsub

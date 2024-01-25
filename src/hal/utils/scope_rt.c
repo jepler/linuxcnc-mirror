@@ -44,7 +44,7 @@ MODULE_AUTHOR("John Kasunich");
 MODULE_DESCRIPTION("Oscilloscope for EMC HAL");
 MODULE_LICENSE("GPL");
 
-long num_samples = 16000;
+long num_samples = SCOPE_NUM_SAMPLES_DEFAULT;
 long shm_size;
 RTAPI_MP_LONG(num_samples, "Number of samples in the shared memory block")
 

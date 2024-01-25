@@ -23,9 +23,9 @@ int arcInitFromPoints(SphericalArc * const arc, PmCartesian const * const start,
         PmCartesian const * const center)
 {
 #ifdef ARC_PEDANTIC
-    if (!P0 || !P1 || !center) {
+    if (!start || !end || !center) {
         return TP_ERR_MISSING_INPUT;
-    
+    }
     if (!arc) {
         return TP_ERR_MISSING_OUTPUT;
     }
@@ -86,18 +86,19 @@ int arcInitFromPoints(SphericalArc * const arc, PmCartesian const * const start,
 
 int arcPoint(SphericalArc const * const arc, double progress, PmCartesian * const out)
 {
-    //TODO pedantic
+#ifdef TP_PEDANTIC
+    if (!arc) {return TP_ERR_MISSING_INPUT;}
+    if (!out) {return TP_ERR_MISSING_OUTPUT;}
+#endif
 
     //Convert progress to actual progress around the arc
     double net_progress = progress - arc->line_length;
     if (net_progress <= 0.0 && arc->line_length > 0) {
-        tc_debug_print("net_progress = %f, line_length = %f\n", net_progress, arc->line_length);
         //Get position on line (not actually an angle in this case)
         pmCartScalMult(&arc->uTan, net_progress, out);
         pmCartCartAdd(out, &arc->start, out);
     } else {
         double angle_in = net_progress / arc->radius;
-        tc_debug_print("angle_in = %f, angle_total = %f\n", angle_in, arc->angle);
         double scale0 = sin(arc->angle - angle_in) / arc->Sangle;
         double scale1 = sin(angle_in) / arc->Sangle;
 
@@ -161,16 +162,32 @@ int arcFromLines(SphericalArc * const arc, PmCartLine const * const line1,
     return arcInitFromPoints(arc, start, end, &center);
 }
 
-int arcConvexTest(PmCartesian const * const center,
-        PmCartesian const * const P, PmCartesian const * const uVec, int reverse_dir)
-{
-    //Check if an arc-line intersection is concave or convex
-    double dot;
-    PmCartesian diff;
-    pmCartCartSub(P, center, &diff);
-    pmCartCartDot(&diff, uVec, &dot);
 
-    tp_debug_print("convex test: dot = %f, reverse_dir = %d\n", dot, reverse_dir);
+/**
+ * Tests if a ray from the specified point / direction intersects the circle with the given center.
+ *
+ * @note that the circle is assumed to be coindicent with P (so the radius is || P - center ||).
+ *
+ * For blending, this is used to determine if a given segment forms a convex or
+ * concave intersection with another segment. "Convex" means that the tangent
+ * vector of the other segment (at P) is in the interior of the circle
+ * containing this segment. For an arc-arc intersection, there are actually 4 possibilities:
+ *
+ * convex-convex (each arc's tangent vector is in the other's interior)
+ * concave-convex
+ * convex-concave
+ * concave-concave
+ */
+int checkRayIntersectsArc(PmCartesian const * const center,
+                          PmCartesian const * const P,
+                          PmCartesian const * const u_ray,
+                          int reverse_dir)
+{
+    double dot;
+    PmCartesian r_CP;
+    pmCartCartSub(P, center, &r_CP);
+    pmCartCartDot(&r_CP, u_ray, &dot);
+
     int convex = (reverse_dir != 0) ^ (dot < 0);
     return convex;
 }

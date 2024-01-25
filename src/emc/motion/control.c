@@ -375,6 +375,13 @@ static void process_probe_inputs(void) {
     old_probeVal = emcmotStatus->probeVal;
 }
 
+// TODO generalize to higher order diff with an array
+static double backward_difference(double curr, double prev, double dt)
+{
+    return (curr - prev) / dt;
+}
+
+
 static void process_inputs(void)
 {
     int joint_num;
@@ -382,10 +389,19 @@ static void process_inputs(void)
     joint_hal_t *joint_data;
     emcmot_joint_t *joint;
     unsigned char enables;
+
     /* read spindle angle (for threading, etc) */
-    emcmotStatus->spindleRevs = *emcmot_hal_data->spindle_revs;
-    emcmotStatus->spindleSpeedIn = *emcmot_hal_data->spindle_speed_in;
+    double prev_revs = emcmotStatus->spindle_fb.position_rev;
+    emcmotStatus->spindle_fb.position_rev = *emcmot_hal_data->spindle_revs;
+    *emcmot_hal_data->spindle_speed_in_estimate = backward_difference(emcmotStatus->spindle_fb.position_rev,
+                                                                      prev_revs,
+                                                                      emcmotConfig->trajCycleTime) * 60.0;
+    emcmotStatus->spindle_fb.velocity_rpm = *emcmot_hal_data->spindle_speed_in;
     emcmotStatus->spindle_is_atspeed = *emcmot_hal_data->spindle_is_atspeed;
+    // Minimum gain is zero (no position error correction), maximum gain is 1 (correct at maximum acceleration)
+    emcmotStatus->spindle_tracking_gain = fmax(fmin(*emcmot_hal_data->spindle_tracking_gain, 1.0), 0.0);
+    emcmotStatus->pos_tracking_mode = *emcmot_hal_data->pos_tracking_mode;
+
     /* compute net feed and spindle scale factors */
     if ( emcmotStatus->motion_state == EMCMOT_MOTION_COORD ) {
 	/* use the enables that were queued with the current move */
@@ -524,19 +540,19 @@ static void process_inputs(void)
     // signal error, and cancel the orient
     if (*(emcmot_hal_data->spindle_orient)) {
 	if (*(emcmot_hal_data->spindle_orient_fault)) {
-	    emcmotStatus->spindle.orient_state = EMCMOT_ORIENT_FAULTED;
+	    emcmotStatus->spindle_cmd.orient_state = EMCMOT_ORIENT_FAULTED;
 	    *(emcmot_hal_data->spindle_orient) = 0;
-	    emcmotStatus->spindle.orient_fault = *(emcmot_hal_data->spindle_orient_fault);
-	    reportError(_("fault %d during orient in progress"), emcmotStatus->spindle.orient_fault);
+	    emcmotStatus->spindle_cmd.orient_fault = *(emcmot_hal_data->spindle_orient_fault);
+	    reportError(_("fault %d during orient in progress"), emcmotStatus->spindle_cmd.orient_fault);
 	    emcmotStatus->commandStatus = EMCMOT_COMMAND_INVALID_COMMAND;
 	    tpAbort(&emcmotDebug->tp);
 	    SET_MOTION_ERROR_FLAG(1);
 	} else if (*(emcmot_hal_data->spindle_is_oriented)) {
 	    *(emcmot_hal_data->spindle_orient) = 0;
 	    *(emcmot_hal_data->spindle_locked) = 1;
-	    emcmotStatus->spindle.locked = 1;
-	    emcmotStatus->spindle.brake = 1;
-	    emcmotStatus->spindle.orient_state = EMCMOT_ORIENT_COMPLETE;
+	    emcmotStatus->spindle_cmd.locked = 1;
+	    emcmotStatus->spindle_cmd.brake = 1;
+	    emcmotStatus->spindle_cmd.orient_state = EMCMOT_ORIENT_COMPLETE;
 	    rtapi_print_msg(RTAPI_MSG_DBG, "SPINDLE_ORIENT complete, spindle locked");
 	}
     }
@@ -1713,16 +1729,16 @@ static void output_to_hal(void)
     *(emcmot_hal_data->teleop_mode) = GET_MOTION_TELEOP_FLAG();
     *(emcmot_hal_data->coord_error) = GET_MOTION_ERROR_FLAG();
     *(emcmot_hal_data->on_soft_limit) = emcmotStatus->on_soft_limit;
-    if(emcmotStatus->spindle.css_factor) {
-	double denom = fabs(emcmotStatus->spindle.xoffset - emcmotStatus->carte_pos_cmd.tran.x);
+    if(emcmotStatus->spindle_cmd.css_factor) {
+	double denom = fabs(emcmotStatus->spindle_cmd.xoffset - emcmotStatus->carte_pos_cmd.tran.x);
 	double speed;
         double maxpositive;
-        if(denom > 0) speed = emcmotStatus->spindle.css_factor / denom;
-	else speed = emcmotStatus->spindle.speed;
+        if(denom > 0) speed = emcmotStatus->spindle_cmd.css_factor / denom;
+    else speed = emcmotStatus->spindle_cmd.velocity_rpm_out;
 
 	speed = speed * emcmotStatus->net_spindle_scale;
 
-        maxpositive = fabs(emcmotStatus->spindle.speed);
+        maxpositive = fabs(emcmotStatus->spindle_cmd.velocity_rpm_out);
         // cap speed to G96 D...
         if(speed < -maxpositive)
             speed = -maxpositive;
@@ -1732,17 +1748,19 @@ static void output_to_hal(void)
 	*(emcmot_hal_data->spindle_speed_out) = speed;
 	*(emcmot_hal_data->spindle_speed_out_rps) = speed/60.;
     } else {
-	*(emcmot_hal_data->spindle_speed_out) = emcmotStatus->spindle.speed * emcmotStatus->net_spindle_scale;
-	*(emcmot_hal_data->spindle_speed_out_rps) = emcmotStatus->spindle.speed * emcmotStatus->net_spindle_scale / 60.;
+    *(emcmot_hal_data->spindle_speed_out) = emcmotStatus->spindle_cmd.velocity_rpm_out * emcmotStatus->net_spindle_scale;
+    *(emcmot_hal_data->spindle_speed_out_rps) = emcmotStatus->spindle_cmd.velocity_rpm_out * emcmotStatus->net_spindle_scale / 60.;
     }
 	*(emcmot_hal_data->spindle_speed_out_abs) = fabs(*(emcmot_hal_data->spindle_speed_out));
 	*(emcmot_hal_data->spindle_speed_out_rps_abs) = fabs(*(emcmot_hal_data->spindle_speed_out_rps));
-    *(emcmot_hal_data->spindle_speed_cmd_rps) = emcmotStatus->spindle.speed / 60.;
-    *(emcmot_hal_data->spindle_on) = ((emcmotStatus->spindle.speed * emcmotStatus->net_spindle_scale) != 0) ? 1 : 0;
+    *(emcmot_hal_data->spindle_speed_cmd_rps) = emcmotStatus->spindle_cmd.velocity_rpm_out / 60.;
+    *(emcmot_hal_data->spindle_on) = ((emcmotStatus->spindle_cmd.velocity_rpm_out * emcmotStatus->net_spindle_scale) != 0) ? 1 : 0;
     *(emcmot_hal_data->spindle_forward) = (*emcmot_hal_data->spindle_speed_out > 0) ? 1 : 0;
     *(emcmot_hal_data->spindle_reverse) = (*emcmot_hal_data->spindle_speed_out < 0) ? 1 : 0;
-    *(emcmot_hal_data->spindle_brake) = (emcmotStatus->spindle.brake != 0) ? 1 : 0;
-    
+    *(emcmot_hal_data->spindle_brake) = (emcmotStatus->spindle_cmd.brake != 0) ? 1 : 0;
+
+    *(emcmot_hal_data->pos_tracking_error) = emcmotStatus->pos_tracking_error;
+
     *(emcmot_hal_data->program_line) = emcmotStatus->id;
     *(emcmot_hal_data->motion_type) = emcmotStatus->motionType;
     *(emcmot_hal_data->distance_to_go) = emcmotStatus->distance_to_go;
@@ -1774,22 +1792,22 @@ static void output_to_hal(void)
     emcmot_hal_data->debug_bit_0 = joints[1].free_tp_active;
     emcmot_hal_data->debug_bit_1 = emcmotStatus->enables_new & AF_ENABLED;
     emcmot_hal_data->debug_float_0 = emcmotStatus->net_feed_scale;
-    emcmot_hal_data->debug_float_1 = emcmotStatus->spindleRevs;
-    emcmot_hal_data->debug_float_2 = emcmotStatus->spindleSpeedIn;
+    emcmot_hal_data->debug_float_1 = emcmotStatus->spindle_fb.position_rev;
+    emcmot_hal_data->debug_float_2 = emcmotStatus->spindle_fb.velocity_rpm;
     emcmot_hal_data->debug_float_3 = emcmotStatus->net_spindle_scale;
     emcmot_hal_data->debug_s32_0 = emcmotStatus->overrideLimitMask;
     emcmot_hal_data->debug_s32_1 = emcmotStatus->tcqlen;
 
     /* two way handshaking for the spindle encoder */
-    if(emcmotStatus->spindle_index_enable && !old_motion_index) {
+    if(emcmotStatus->spindle_fb.index_enable && !old_motion_index) {
         *emcmot_hal_data->spindle_index_enable = 1;
     }
 
     if(!*emcmot_hal_data->spindle_index_enable && old_hal_index) {
-        emcmotStatus->spindle_index_enable = 0;
+        emcmotStatus->spindle_fb.index_enable = 0;
     }
 
-    old_motion_index = emcmotStatus->spindle_index_enable;
+    old_motion_index = emcmotStatus->spindle_fb.index_enable;
     old_hal_index = *emcmot_hal_data->spindle_index_enable;
 
     *(emcmot_hal_data->tooloffset_x) = emcmotStatus->tool_offset.tran.x;

@@ -1,0 +1,13 @@
+o<default_mm> call
+F1000
+G0 X0 Y0 Z0
+G1 X10
+G18
+G3 X-10 R10
+G0 X0 Y0 Z0
+
+G1 X0 Y10
+G19
+G3 Y-20 R20
+G0 X0 Y0 Z0
+M2

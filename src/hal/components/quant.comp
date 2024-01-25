@@ -1,0 +1,29 @@
+//   This is a component for EMC2 HAL
+//   Copyright 2016 Robert W. Ellenberg <rwe24g@gmail.com>
+//
+//   This program is free software; you can redistribute it and/or
+//   modify it under the terms of version 2 of the GNU General
+//   Public License as published by the Free Software Foundation.
+//
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//
+//   You should have received a copy of the GNU General Public License
+//   along with this program; if not, write to the Free Software
+//   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+component quant "Quantize an input signal to a specified number of levels";
+
+pin in float in "Analog input value" ;
+pin in float resolution "Resolution of output signal (levels per unit)" ;
+pin out float out "Quantized output value (analog)";
+
+function _;
+license "GPL";
+;;
+#include "rtapi_math.h"
+FUNCTION(_) {
+    out = floor(in * resolution) / resolution;
+}

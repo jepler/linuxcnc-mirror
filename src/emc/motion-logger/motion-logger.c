@@ -571,13 +571,14 @@ int main(int argc, char* argv[]) {
                 break;
 
             case EMCMOT_SPINDLE_ON:
-                log_print("SPINDLE_ON speed=%f, css_factor=%f, xoffset=%f\n", c->vel, c->ini_maxvel, c->acc);
-                emcmotStatus->spindle.speed = c->vel;
+                log_print("SPINDLE_ON speed=%f, css_factor=%f, xoffset=%f\n",
+                          c->spindle_speed, c->css_factor, c->css_xoffset);
+                emcmotStatus->spindle_cmd.velocity_rpm_out = c->spindle_speed;
                 break;
 
             case EMCMOT_SPINDLE_OFF:
                 log_print("SPINDLE_OFF\n");
-                emcmotStatus->spindle.speed = 0;
+                emcmotStatus->spindle_cmd.velocity_rpm_out = 0;
                 break;
 
             case EMCMOT_SPINDLE_INCREASE:
@@ -623,6 +624,12 @@ int main(int argc, char* argv[]) {
 
             case EMCMOT_SETUP_ARC_BLENDS:
                 log_print("SETUP_ARC_BLENDS\n");
+                break;
+
+            case EMCMOT_SETUP_CONSISTENCY_CHECKS:
+                log_print("SETUP_CONSISTENCY_CHECKS enabled=%d, position_drift=%f\n",
+                          c->consistencyCheckConfig.extraConsistencyChecks,
+                          c->consistencyCheckConfig.maxPositionDriftError);
                 break;
 
             default:

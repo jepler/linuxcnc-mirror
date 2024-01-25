@@ -1,0 +1,9 @@
+(Test code for new blend velocity function)
+G20 G90 G61
+G0 X0 Y0 Z0
+G64
+G1 X5 Y5 F9999
+G1 Y6
+G1 X0 Y11
+G0 X0 Y0 Z0
+M30

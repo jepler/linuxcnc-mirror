@@ -1,0 +1,9 @@
+o<default_mm> call
+(Basic ARC_FEED test using canon default units)
+G61
+F1000
+G0 X0 Y0 Z0
+G1 X10
+G3 Y-10 R10 (270 deg. arc CCW)
+G0 X0 Y0 Z0
+M2

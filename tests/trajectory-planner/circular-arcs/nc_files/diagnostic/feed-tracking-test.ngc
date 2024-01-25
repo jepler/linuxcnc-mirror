@@ -1,4 +1,4 @@
-G90 G20
+o<default_inch> call
 
 G64 P0.005 Q0.0
 
@@ -10,4 +10,3 @@ G1 X5 F1000
 G1 X6 F1000
 G1 X7 F1000
 M2
-

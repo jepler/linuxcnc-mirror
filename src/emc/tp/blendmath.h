@@ -141,12 +141,18 @@ int findIntersectionAngle(PmCartesian const * const u1,
 
 double pmCartMin(PmCartesian const * const in);
 
-int calculateInscribedDiameter(PmCartesian const * const normal,
-        PmCartesian const * const bounds, double * const diameter);
+int calculateInscribedRadius(PmCartesian const * const normal,
+        PmCartesian const * const bounds, double * const radius);
 
 int findAccelScale(PmCartesian const * const acc,
         PmCartesian const * const bounds,
         PmCartesian * const scale);
+
+double findTrapezoidalDesiredVel(double a_max,
+                              double dx,
+                              double v_final,
+                              double currentvel,
+                              double cycle_time);
 
 int pmUnitCartsColinear(PmCartesian const * const u1,
         PmCartesian const * const u2);
@@ -256,9 +262,24 @@ int pmCircleAngleFromProgress(PmCircle const * const circle,
         double progress,
         double * const angle);
 double pmCircleEffectiveMinRadius(const PmCircle *circle);
+double spiralEffectiveRadius(PmCircle const * circle);
 
 static inline double findVPeak(double a_t_max, double distance)
 {
     return pmSqrt(a_t_max * distance);
 }
+
+// Start by mimicing the current structure for minimal changes
+typedef struct {
+    double v_f;
+    double dt;
+} EndCondition;
+
+EndCondition checkEndCondition(double cycleTime,
+                               double progress,
+                               double target,
+                               double currentvel,
+                               double v_f,
+                               double a_max);
+
 #endif

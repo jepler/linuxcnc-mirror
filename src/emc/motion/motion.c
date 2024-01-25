@@ -321,11 +321,19 @@ static int init_hal_io(void)
     *(emcmot_hal_data->spindle_orient) = 0;
 
 
-//    if ((retval = hal_pin_bit_newf(HAL_OUT, &(emcmot_hal_data->inpos_output), mot_comp_id, "motion.motion-inpos")) < 0) goto error;
     if ((retval = hal_pin_float_newf(HAL_IN, &(emcmot_hal_data->spindle_revs), mot_comp_id, "motion.spindle-revs")) < 0) goto error;
     if ((retval = hal_pin_float_newf(HAL_IN, &(emcmot_hal_data->spindle_speed_in), mot_comp_id, "motion.spindle-speed-in")) < 0) goto error;
+    // Inspired by pid.c "dummysig" pins that estimate velocity internally
+    emcmot_hal_data->spindle_speed_in_estimate = emcmot_hal_data->spindle_speed_in;
+
     if ((retval = hal_pin_bit_newf(HAL_IN, &(emcmot_hal_data->spindle_is_atspeed), mot_comp_id, "motion.spindle-at-speed")) < 0) goto error;
     *emcmot_hal_data->spindle_is_atspeed = 1;
+
+    if ((retval = hal_pin_float_newf(HAL_IN, &(emcmot_hal_data->spindle_tracking_gain), mot_comp_id, "motion.spindle-tracking-gain")) < 0) goto error;
+    *emcmot_hal_data->spindle_tracking_gain = 1.0;
+    if ((retval = hal_pin_s32_newf(HAL_IN, &(emcmot_hal_data->pos_tracking_mode), mot_comp_id, "motion.pos-tracking-mode")) < 0) goto error;
+    if ((retval = hal_pin_float_newf(HAL_OUT, &(emcmot_hal_data->pos_tracking_error), mot_comp_id, "motion.pos-tracking-error")) < 0) goto error;
+
     if ((retval = hal_pin_float_newf(HAL_IN, &(emcmot_hal_data->adaptive_feed), mot_comp_id, "motion.adaptive-feed")) < 0) goto error;
     *(emcmot_hal_data->adaptive_feed) = 1.0;
     if ((retval = hal_pin_bit_newf(HAL_IN, &(emcmot_hal_data->feed_hold), mot_comp_id, "motion.feed-hold")) < 0) goto error;
@@ -912,7 +920,7 @@ static int init_comm_buffers(void)
     emcmotStatus->activeDepth = 0;
     emcmotStatus->paused = 0;
     emcmotStatus->overrideLimitMask = 0;
-    emcmotStatus->spindle.speed = 0.0;
+    emcmotStatus->spindle_cmd.velocity_rpm_out = 0.0;
     SET_MOTION_INPOS_FLAG(1);
     SET_MOTION_ENABLE_FLAG(0);
     emcmotConfig->kinematics_type = kinType;
@@ -1034,21 +1042,20 @@ static int init_comm_buffers(void)
 
     /* init motion emcmotDebug->tp */
     if (-1 == tpCreate(&emcmotDebug->tp, DEFAULT_TC_QUEUE_SIZE,
-	    emcmotDebug->queueTcSpace)) {
-	rtapi_print_msg(RTAPI_MSG_ERR,
-	    "MOTION: failed to create motion emcmotDebug->tp\n");
-	return -1;
+                       emcmotDebug->queueTcSpace)) {
+        rtapi_print_msg(RTAPI_MSG_ERR,
+                        "MOTION: failed to create motion emcmotDebug->tp\n");
+        return -1;
     }
-//    tpInit(&emcmotDebug->tp); // tpInit called from tpCreate
+
     tpSetCycleTime(&emcmotDebug->tp, emcmotConfig->trajCycleTime);
-    tpSetPos(&emcmotDebug->tp, &emcmotStatus->carte_pos_cmd);
-    tpSetVmax(&emcmotDebug->tp, emcmotStatus->vel, emcmotStatus->vel);
-    tpSetAmax(&emcmotDebug->tp, emcmotStatus->acc);
+    int res_pos = tpSetPos(&emcmotDebug->tp, &emcmotStatus->carte_pos_cmd);
+    int res_vel = tpSetVmax(&emcmotDebug->tp, emcmotStatus->vel, emcmotStatus->vel);
 
     emcmotStatus->tail = 0;
 
     rtapi_print_msg(RTAPI_MSG_INFO, "MOTION: init_comm_buffers() complete\n");
-    return 0;
+    return res_pos | res_vel;
 }
 
 /* init_threads() creates realtime threads, exports functions to

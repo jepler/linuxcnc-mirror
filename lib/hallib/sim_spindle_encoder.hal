@@ -5,26 +5,39 @@ setp sim_spindle.scale 0.01666667
 loadrt limit2 names=limit_speed
 loadrt lowpass names=spindle_mass
 loadrt near names=near_speed
+loadrt quant names=sim_spindle_encoder,spindle_vel_est
 
-# this limit doesnt make any sense to me:
+# Bound spindle acceleration to something reasonable
 setp limit_speed.maxv 5000.0 # rpm/second
 
 # encoder reset control
 # hook up motion controller's sync output
 net spindle-index-enable motion.spindle-index-enable <=> sim_spindle.index-enable
 
+# Set resolution of spindle encoder in counts / revolution (Note: this value is 4 * LPR or PPR)
+setp sim_spindle_encoder.resolution 64.0
+
+# Simulated spindle encoder
+net spindle-pos-raw sim_spindle.position-fb => sim_spindle_encoder.in
+
 # report our revolution count to the motion controller
-net spindle-pos sim_spindle.position-fb => motion.spindle-revs
+net spindle-pos sim_spindle_encoder.out => motion.spindle-revs
 
 # simulate spindle mass
-setp spindle_mass.gain .07
+setp spindle_mass.gain .005
 
-# spindle speed control
+# Limit spindle speed by our maximum value
 net spindle-speed-cmd  motion.spindle-speed-out => limit_speed.in
-net spindle-speed-limited limit_speed.out => sim_spindle.velocity-cmd spindle_mass.in
 
-# for spindle velocity estimate
-net spindle-rpm-filtered spindle_mass.out motion.spindle-speed-in near_speed.in2
+# Simulate spindle mass with a low-pass filter on the velocity command
+net spindle-speed-limited limit_speed.out => spindle_mass.in
+
+# Feed the simulated spindle speed into the sim spindle to generate a position signal
+net spindle-rpm-filtered spindle_mass.out => sim_spindle.velocity-cmd near_speed.in2 spindle_vel_est.in
+
+# Approximate velocity quantization assuming 360 RPM, 30kHz base thread, 100 PPR encoder
+setp spindle_vel_est.resolution 8.0
+net spindle-rpm-est spindle_vel_est.out => motion.spindle-speed-in
 
 # at-speed detection
 setp near_speed.scale 1.1
@@ -37,3 +50,5 @@ addf limit_speed servo-thread
 addf spindle_mass servo-thread
 addf near_speed servo-thread
 addf sim_spindle servo-thread
+addf sim_spindle_encoder servo-thread
+addf spindle_vel_est servo-thread

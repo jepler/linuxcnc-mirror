@@ -1,6 +1,6 @@
-g64
-g0x0y0z1
-g1z-.1f3000
-x1
-z1
-m30
+o<default_inch> call
+G0 X0 Y0 Z1
+G1 Z-.1 F3000
+X1
+Z1
+M30

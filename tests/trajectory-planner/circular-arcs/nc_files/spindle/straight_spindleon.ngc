@@ -1,6 +1,6 @@
 (Simple straight line case to test "perfect" tangent case)
-(Setup code)
-G20 G90 G64 G17
+o<default_inch> call
+
 (Test code begins here)
 
 O100 sub

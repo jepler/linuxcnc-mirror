@@ -1,6 +1,6 @@
-G20 g64
-g0x0y0w1
-g1w-.1f3000
-x1
-w1
-m30
+o<default_inch> call
+G0 X0 Y0 W1
+G1 W-.1 F3000
+X1
+W1
+M2

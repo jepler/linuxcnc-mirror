@@ -19,7 +19,7 @@ X0.0 Y1
 X0 Y0 
 o100 endsub
 
-G20 G90 G17
+o<default_inch> call
 
 ("Default" blending with no G64 words)
 

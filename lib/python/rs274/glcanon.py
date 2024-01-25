@@ -49,6 +49,8 @@ class GLCanon(Translated, ArcsToSegmentsMixin):
         self.arcfeed = []; self.arcfeed_append = self.arcfeed.append
         # dwell list - [line number, color, pos x, pos y, pos z, plane]
         self.dwells = []; self.dwells_append = self.dwells.append
+        # spindle-synched feed list - (line number, (position deltas), S, fpr)
+        self.feed_synched = []
         self.choice = None
         self.feedrate = 1
         self.lo = (0,) * 9
@@ -162,6 +164,32 @@ class GLCanon(Translated, ArcsToSegmentsMixin):
                 self.min_extents_notool[0], self.min_extents_notool[1], min_z
             self.max_extents_notool = \
                 self.max_extents_notool[0], self.max_extents_notool[1], max_z
+    def calc_velocity(self, delta, axis_max_vel):
+        """Using techniques from getStraightVelocity() in emccanon.cc, given 9
+        axis deltas and velocity limits, calculate max velocity of a
+        straight move; deltas should be absolute; invalid axes should be 0
+        """
+        # Clean up tiny values
+        delta = tuple([(0.0 if i<1e-7 else i) for i in delta])
+        # Fastest time of coordinated move is the maximum time of any
+        # one axis to perform move at axis max velocity
+        tmax = max([(i[0]/i[1] if i[1] else 0.0)
+                     for i in zip(delta, axis_max_vel)])
+        # Total distance is the hypotenuse of a set of three axes;
+        # which set depends on the type of move
+        if sum(delta[0:3]) > 0:
+            # Linear XYZ with or without ABC or UVW
+            dtot = math.sqrt(sum(i*i for i in delta[0:3]))
+        elif sum(delta[6:9]) > 0:
+            # Linear UVW without XYZ and with or without ABC
+            dtot = math.sqrt(sum(i*i for i in delta[6:9]))
+        else:
+            # Angular-only
+            dtot = math.sqrt(sum(i*i for i in delta[3:6]))
+        # Max velocity = total distance / fastest time
+        max_vel = dtot/tmax
+        return max_vel
+
     def tool_offset(self, xo, yo, zo, ao, bo, co, uo, vo, wo):
         self.first_move = True
         x, y, z, a, b, c, u, v, w = self.lo
@@ -229,6 +257,18 @@ class GLCanon(Translated, ArcsToSegmentsMixin):
         self.feed_append((self.lineno, self.lo, l, self.feedrate, [self.xo, self.yo, self.zo]))
         self.lo = l
     straight_probe = straight_feed
+
+    def straight_feed_synched(self, lineno, x,y,z, a,b,c, u,v,w, s, fpr):
+        """For spindle-synched straight feeds, also collect data needed to
+        check if the commanded spindle rate and feed per revolution
+        will violate any axis MAX_VELOCITY constraints"""
+        if self.suppress > 0: return
+        # save segment start and record straight feed segment
+        lo = self.lo
+        self.straight_feed(x,y,z, a,b,c, u, v, w)
+        # record axis distances, spindle speed and feed per revolution
+        delta = tuple([abs(i[0]-i[1]) for i in zip(lo, self.lo)])
+        self.feed_synched.append((lineno, delta, s, fpr))
 
     def user_defined_function(self, i, p, q):
         if self.suppress > 0: return

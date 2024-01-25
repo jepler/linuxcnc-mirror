@@ -1,171 +1,74 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <pyvcp>
-    <label>
-        <text>"Peak Values"</text>
-    </label>
-    <label>
-        <text>"X Axis"</text>
-    </label>
-    <hbox>
-        <label>
-            <text>"+Acc"</text>
-        </label>
-        <number>
-            <halpin>"pxacc"</halpin>
-            <font>("Helvetica",24)</font>
-            <format>"+4.4f"</format>
-        </number>
-        <label>
-            <text>"+Vel"</text>
-        </label>
-        <number>
-            <halpin>"pxvel"</halpin>
-            <font>("Helvetica",24)</font>
-            <format>"+4.4f"</format>
-        </number>
-    </hbox>
-    <hbox>
-        <label>
-            <text>"-Acc"</text>
-        </label>
-        <number>
-            <halpin>"nxacc"</halpin>
-            <font>("Helvetica",24)</font>
-            <format>"+4.4f"</format>
-        </number>
-        <label>
-            <text>"-Vel"</text>
-        </label>
-        <number>
-            <halpin>"nxvel"</halpin>
-            <font>("Helvetica",24)</font>
-            <format>"+4.4f"</format>
-        </number>
-    </hbox>
-    <label>
-        <text>"Y Axis"</text>
-    </label>
-    <hbox>
-        <label>
-            <text>"+Acc"</text>
-        </label>
-        <number>
-            <halpin>"pyacc"</halpin>
-            <font>("Helvetica",24)</font>
-            <format>"+4.4f"</format>
-        </number>
-        <label>
-            <text>"+Vel"</text>
-        </label>
-        <number>
-            <halpin>"pyvel"</halpin>
-            <font>("Helvetica",24)</font>
-            <format>"+4.4f"</format>
-        </number>
-    </hbox>
-    <hbox>
-        <label>
-            <text>"-Acc"</text>
-        </label>
-        <number>
-            <halpin>"nyacc"</halpin>
-            <font>("Helvetica",24)</font>
-            <format>"+4.4f"</format>
-        </number>
-        <label>
-            <text>"-Vel"</text>
-        </label>
-        <number>
-            <halpin>"nyvel"</halpin>
-            <font>("Helvetica",24)</font>
-            <format>"+4.4f"</format>
-        </number>
-    </hbox>
-    <label>
-        <text>"Z Axis"</text>
-    </label>
-    <hbox>
-        <label>
-            <text>"+Acc"</text>
-        </label>
-        <number>
-            <halpin>"pzacc"</halpin>
-            <font>("Helvetica",24)</font>
-            <format>"+4.4f"</format>
-        </number>
-        <label>
-            <text>"+Vel"</text>
-        </label>
-        <number>
-            <halpin>"pzvel"</halpin>
-            <font>("Helvetica",24)</font>
-            <format>"+4.4f"</format>
-        </number>
-    </hbox>
-    <hbox>
-        <label>
-            <text>"-Acc"</text>
-        </label>
-        <number>
-            <halpin>"nzacc"</halpin>
-            <font>("Helvetica",24)</font>
-            <format>"+4.4f"</format>
-        </number>
-        <label>
-            <text>"-Vel"</text>
-        </label>
-        <number>
-            <halpin>"nzvel"</halpin>
-            <font>("Helvetica",24)</font>
-            <format>"+4.4f"</format>
-        </number>
-    </hbox>
-
-
-    <label>
-        <text>"A Axis"</text>
-    </label>
-    <hbox>
-        <label>
-            <text>"+Acc"</text>
-        </label>
-        <number>
-            <halpin>"paacc"</halpin>
-            <font>("Helvetica",24)</font>
-            <format>"+4.4f"</format>
-        </number>
-        <label>
-            <text>"+Vel"</text>
-        </label>
-        <number>
-            <halpin>"pavel"</halpin>
-            <font>("Helvetica",24)</font>
-            <format>"+4.4f"</format>
-        </number>
-    </hbox>
-    <hbox>
-        <label>
-            <text>"-Acc"</text>
-        </label>
-        <number>
-            <halpin>"naacc"</halpin>
-            <font>("Helvetica",24)</font>
-            <format>"+4.4f"</format>
-        </number>
-        <label>
-            <text>"-Vel"</text>
-        </label>
-        <number>
-            <halpin>"navel"</halpin>
-            <font>("Helvetica",24)</font>
-            <format>"+4.4f"</format>
-        </number>
-    </hbox>
-
-    <button>
-        <halpin>"resetmm"</halpin>
-        <text>"reset"</text>
-    </button>
+    <labelframe text="Peak Axis Values">
+        <table>
+            <tablesticky sticky="s"/>
+            <tablerow/>
+            <label>
+                <text>"Axis "</text>
+            </label>
+            <tablespan columns="2"/>
+            <label>
+                <text>"Accelation"</text>
+            </label>
+            <tablespan columns="2"/>
+            <label>
+                <text>"Velocity"</text>
+            </label>
+            <tablerow/>
+            <label>
+                <text>"X"</text>
+            </label>
+            <number>
+                <halpin>"pxacc"</halpin>
+                <font>("Helvetica",24)</font>
+                <format>"+4.3f"</format>
+            </number>
+            <number>
+                <halpin>"nxacc"</halpin>
+                <font>("Helvetica",24)</font>
+                <format>"+4.3f"</format>
+            </number>
+            <number>
+                <halpin>"pxvel"</halpin>
+                <font>("Helvetica",24)</font>
+                <format>"+4.2f"</format>
+            </number>
+            <number>
+                <halpin>"nxvel"</halpin>
+                <font>("Helvetica",24)</font>
+                <format>"+4.2f"</format>
+            </number>
+            <tablerow/>
+            <label>
+                <text>"Y"</text>
+            </label>
+            <number>
+                <halpin>"pyacc"</halpin>
+                <font>("Helvetica",24)</font>
+                <format>"+4.3f"</format>
+            </number>
+            <number>
+                <halpin>"nyacc"</halpin>
+                <font>("Helvetica",24)</font>
+                <format>"+4.3f"</format>
+            </number>
+            <number>
+                <halpin>"pyvel"</halpin>
+                <font>("Helvetica",24)</font>
+                <format>"+4.2f"</format>
+            </number>
+            <number>
+                <halpin>"nyvel"</halpin>
+                <font>("Helvetica",24)</font>
+                <format>"+4.2f"</format>
+            </number>
+        </table>
+        <button>
+            <halpin>"resetmm"</halpin>
+            <text>"reset"</text>
+        </button>
+    </labelframe>
     <hbox>
         <label>
             <text>"Cycle Time"</text>
@@ -174,25 +77,17 @@
         <u32>
             <halpin>"time-hours"</halpin>
             <font>("Helvetica",14)</font>
-            <format>"2d"</format>
+            <format>".2d :"</format>
         </u32>
-        <label>
-            <text>":"</text>
-            <font>("Helvetica",14)</font>
-        </label>
         <u32>
             <halpin>"time-minutes"</halpin>
             <font>("Helvetica",14)</font>
-            <format>"2d"</format>
+            <format>".2d :"</format>
         </u32>
-        <label>
-            <text>":"</text>
-            <font>("Helvetica",14)</font>
-        </label>
         <u32>
             <halpin>"time-seconds"</halpin>
             <font>("Helvetica",14)</font>
-            <format>"2d"</format>
+            <format>".2d"</format>
         </u32>
     </hbox>
 </pyvcp>

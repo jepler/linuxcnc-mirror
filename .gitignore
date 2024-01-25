@@ -40,3 +40,8 @@ oprofile*
 position.txt
 *.9
 *.glade.h
+
+*.glade.h
+# expanded INI files
+*.ini.expanded
+build

@@ -78,6 +78,25 @@ int emcPoseSub(EmcPose const * const p1, EmcPose const * const p2, EmcPose * con
 
 }
 
+int emcPoseMultScalar(EmcPose * const p1, double m)
+{
+#ifdef EMCPOSE_PEDANTIC
+    if (!p1 || !p2) {
+        return EMCPOSE_ERR_INPUT_MISSING;
+    }
+#endif
+
+    pmCartScalMultEq(&p1->tran, m);
+    p1->a *= m;
+    p1->b *= m;
+    p1->c *= m;
+    p1->u *= m;
+    p1->v *= m;
+    p1->w *= m;
+    return EMCPOSE_ERR_OK;
+}
+
+
 int emcPoseSelfAdd(EmcPose * const self, EmcPose const * const p2)
 {
     return emcPoseAdd(self, p2, self);
@@ -305,4 +324,27 @@ int emcPoseValid(EmcPose const * const pose)
     } else {
         return 1;
     }
+}
+
+/**
+ * Checks all axis values in an EmcPose to see if they exceed a magnitude threshold.
+ * @return a bitmask that is 0 if all axes are within the threshold. Any
+ * out-of-limit axes set their corresponding bit to 1 in the returned value (X
+ * is 0th bit, Y is 1st, etc.).
+ */
+unsigned int findAbsThresholdViolations(EmcPose vec, double threshold)
+{
+    threshold = fabs(threshold);
+    // Bit-mask each failure so we can report all failed axes
+    unsigned fail_bits = (unsigned)(0x0
+            | (fabs(vec.tran.x) > threshold) << 0
+            | (fabs(vec.tran.y) > threshold) << 1
+            | (fabs(vec.tran.z) > threshold) << 2
+            | (fabs(vec.a) > threshold) << 3
+            | (fabs(vec.b) > threshold) << 4
+            | (fabs(vec.c) > threshold) << 5
+            | (fabs(vec.u) > threshold) << 6
+            | (fabs(vec.v) > threshold) << 7
+            | (fabs(vec.w) > threshold) << 8);
+    return fail_bits;
 }

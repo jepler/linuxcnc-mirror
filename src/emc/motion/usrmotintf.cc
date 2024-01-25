@@ -249,7 +249,6 @@ void printTPstruct(TP_STRUCT * tp)
     printf("queueSize=%d\n", tp->queueSize);
     printf("cycleTime=%f\n", tp->cycleTime);
     printf("vMax=%f\n", tp->vMax);
-    printf("aMax=%f\n", tp->aMax);
     printf("vLimit=%f\n", tp->vLimit);
     printf("wMax=%f\n", tp->wMax);
     printf("wDotMax=%f\n", tp->wDotMax);

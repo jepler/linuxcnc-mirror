@@ -18,6 +18,8 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
+#ifndef SEQUENTIAL_H
+#define SEQUENTIAL_H
 
 #define NBR_SEQUENTIAL_PAGES 5
 
@@ -116,4 +118,4 @@ typedef struct StrSequential
 	StrSeqComment SeqComment[ NBR_SEQ_COMMENTS ];
 }StrSequential;
 
-
+#endif

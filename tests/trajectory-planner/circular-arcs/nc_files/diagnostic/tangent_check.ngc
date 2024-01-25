@@ -1,4 +1,5 @@
-G61 G90
+o<default_inch> call
+G61
  G0 X-.1 Y0 Z0 F20
  G1 X0 Y0 Z0
 G64

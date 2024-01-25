@@ -1,0 +1,19 @@
+o<default_inch> call
+(Disable NCD to force tangent segments to be sent separately)
+G0 X0 Y0 Z0
+G91
+G2 Y-10 R5 F1000
+G3 Y-2 R1
+G2 Y-1 R.5
+G3 Y-.2 R.1
+G2 Y-.1 R.05
+G3 Y-.02 Z.5 R.01
+G3 Y+.02 Z.5 R.01
+G3 Y-.02 Z.5 R.01
+G1 X2
+G90
+G0 X0
+Y0
+
+M5
+M2

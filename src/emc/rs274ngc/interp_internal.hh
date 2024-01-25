@@ -26,6 +26,7 @@
 #include "emcpos.h"
 #include "libintl.h"
 #include "python_plugin.hh"
+#include "interp_base.hh"
 
 
 #define _(s) gettext(s)

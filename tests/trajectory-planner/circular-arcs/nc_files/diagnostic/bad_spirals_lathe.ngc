@@ -1,7 +1,5 @@
-G90 G20 G40
+o<default_inch> call
 G18
-G64 P0 Q0
-/G61.1
 
 G0 X0 Z0
 G1 Z0 F100

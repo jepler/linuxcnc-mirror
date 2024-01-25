@@ -4,7 +4,7 @@
 G21 (Units: Metric)
 G40 G90
 F1 S1
-G64 P0.01 q00.01
+G64 P0.01 q0.01
 (Part: 51 Meander Ave)
 (Operation: Outside Offset, LAYER_1, T210: Stainless 2.0mm)
 G00

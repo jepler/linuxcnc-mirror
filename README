@@ -46,3 +46,14 @@ to run the software go back to the top level directory, and issue:
 
   . scripts/rip-environment
   linuxcnc
+
+
+Unit Tests
+---------
+
+Building unit tests requires Meson (see https://mesonbuild.com/Getting-meson.html for details).
+
+To build and run the unit tests (from the repositor root directory):
+
+  meson build && cd build
+  ninja test

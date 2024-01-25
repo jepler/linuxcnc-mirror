@@ -1,5 +1,5 @@
-G20 G90 
-G64 P0.0 Q0.0
+(Demonstrate low acceleration in last segment due to G64)
+o<default_inch> call
 F1000
 G0 X0 Y0 Z0
 G1 X1

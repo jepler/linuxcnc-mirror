@@ -1,0 +1,30 @@
+(Test blend performance during G95 feed mode)
+G20 G90
+G94
+#2=1000
+M3 S[#2]
+G0 X0.0 Z0.0
+F0
+G95
+#1=0.01
+G1 X0.1 F[#1]
+G1 X0.2 F[#1]
+G1 X0.3 F[#1]
+G1 X0.4 F[#1]
+G1 X0.5 F[#1]
+G1 X1.0 F[#1]
+(Test transition between G94 / G95)
+G94
+G1 Z1.0 F[60.0*#2*#1]
+G95
+G1 X0.6 F[#1]
+G1 X0.5 F[#1]
+G1 X0.4 F[#1]
+G1 X0.0 F[#1]
+G1 Z0.5 F[#1]
+G1 Z0.0 F[#1]
+G94
+G0 X0.0 Z0.0
+M5
+M2
+

@@ -60,8 +60,8 @@ int arcFromLines(SphericalArc * const arc, PmCartLine const * const line1,
         PmCartLine const * const line2, double radius,
         double blend_dist, double center_dist, PmCartesian * const start, PmCartesian * const end, int consume);
 
-int arcConvexTest(PmCartesian const * const center,
-        PmCartesian const * const P, PmCartesian const * const uVec, int reverse_dir);
+int checkRayIntersectsArc(PmCartesian const * const center,
+        PmCartesian const * const P, PmCartesian const * const u_ray, int reverse_dir);
 
 int arcTangent(SphericalArc const * const arc, PmCartesian * const tan, int at_end);
 #endif

@@ -1,0 +1,42 @@
+(ngcgui: FEATURE 150727:14.08.25)
+(ngcgui: files: < /home/tom/linuxcnc/nc_files/tap.ngc >)
+(ngcgui: feature line added) #<_feature:> = 0
+(Positional parameters for /home/tom/linuxcnc/nc_files/tap.ngc:)
+          #1 = 1
+          #2 = 1.25
+          #3 = 1
+          #4 = -10
+          #5 = 275
+          #6 = 4
+          #7 = 9
+(expanded file: /home/tom/linuxcnc/nc_files/tap.ngc)
+    (info: Rigid Tapping)
+    #<thread-type> = #1 (=0 0=TPI 1=MM)
+    #<thread> = #2 (TPI/Pitch)
+    #<Z_Start> = #3 (=0.100 Z Clearance)
+    #<T_Depth> = #4 (End of Thread)
+    #<RPM> = #5 (Spindle RPM)
+    #<ToolNumber> = #6 (Tool Number)
+    #<Coolant> = #7 (=8 Coolant 8 On 9 Off)
+    G17 G20 G40 G80
+    T#<ToolNumber> M6 G43
+o<053o110>  if [#<thread-type> EQ 0]
+      #<pitch> = [1 / #<thread>]
+      G20
+o<053o110>  else
+      #<pitch> = #<thread>
+      G21
+o<053o110>  endif
+    ; Tap the Hole
+o<053o120>  if [#<thread-type> EQ 0 OR #<thread-type> EQ 1]
+      S#<RPM> M3 M#<Coolant>
+      G0 X0.000 Z#<Z_Start>
+      G33.1 X0.000 Z#<T_Depth> K#<pitch>
+      M5 M9
+      G53 G0 X0 Z0
+o<053o120>  else
+      (msg, you dufus you didn't use a proper thread type)
+o<053o120>  endif
+    ; Restore to normal units
+    G20
+(ngcgui: m2 line added) m2 (g54 activated)

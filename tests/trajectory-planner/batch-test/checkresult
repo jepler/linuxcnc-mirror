@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Passthrough since the batch test catches errors as it reports them
+exit 0

@@ -193,6 +193,14 @@ static int loadTraj(EmcIniFile *trajInifile)
         old_inihal_data.traj_arc_blend_tangent_kink_ratio = arcBlendTangentKinkRatio;
         //TODO update inihal
 
+        int extraConsistencyChecks = 0;
+        double maxPositionDriftError = 0.0001;
+
+        trajInifile->Find(&extraConsistencyChecks, "EXTRA_CONSISTENCY_CHECKS", "TRAJ");
+        trajInifile->Find(&maxPositionDriftError, "MAX_POSITION_DRIFT_ERROR", "TRAJ");
+
+        emcSetupConsistencyChecks(extraConsistencyChecks, maxPositionDriftError);
+
         double maxFeedScale = 1.0;
         trajInifile->Find(&maxFeedScale, "MAX_FEED_OVERRIDE", "DISPLAY");
 

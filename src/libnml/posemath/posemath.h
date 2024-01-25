@@ -123,7 +123,7 @@ struct PM_HOMOGENEOUS;		/* Hom */
 struct PM_CARTESIAN {
     /* ctors/dtors */
     PM_CARTESIAN() {
-    };
+    }
     PM_CARTESIAN(double _x, double _y, double _z);
 #ifdef INCLUDE_POSEMATH_COPY_CONSTRUCTORS
     PM_CARTESIAN(PM_CCONST PM_CARTESIAN & cart);	// added 7-May-1997
@@ -151,7 +151,7 @@ struct PM_CARTESIAN {
 struct PM_SPHERICAL {
     /* ctors/dtors */
     PM_SPHERICAL() {
-    };
+    }
 #ifdef INCLUDE_POSEMATH_COPY_CONSTRUCTORS
     PM_SPHERICAL(PM_CCONST PM_SPHERICAL & s);
 #endif
@@ -171,7 +171,7 @@ struct PM_SPHERICAL {
 struct PM_CYLINDRICAL {
     /* ctors/dtors */
     PM_CYLINDRICAL() {
-    };
+    }
 #ifdef INCLUDE_POSEMATH_COPY_CONSTRUCTORS
     PM_CYLINDRICAL(PM_CCONST PM_CYLINDRICAL & c);
 #endif
@@ -191,7 +191,7 @@ struct PM_CYLINDRICAL {
 struct PM_ROTATION_VECTOR {
     /* ctors/dtors */
     PM_ROTATION_VECTOR() {
-    };
+    }
 #ifdef INCLUDE_POSEMATH_COPY_CONSTRUCTORS
     PM_ROTATION_VECTOR(PM_CCONST PM_ROTATION_VECTOR & r);
 #endif
@@ -211,7 +211,7 @@ struct PM_ROTATION_VECTOR {
 struct PM_ROTATION_MATRIX {
     /* ctors/dtors */
     PM_ROTATION_MATRIX() {
-    };
+    }
 #ifdef INCLUDE_POSEMATH_COPY_CONSTRUCTORS
     PM_ROTATION_MATRIX(PM_CCONST PM_ROTATION_MATRIX & mat);	/* added
 								   7-May-1997 
@@ -244,7 +244,7 @@ enum PM_AXIS { PM_X, PM_Y, PM_Z };
 struct PM_QUATERNION {
     /* ctors/dtors */
     PM_QUATERNION() {
-    };
+    }
 #ifdef INCLUDE_POSEMATH_COPY_CONSTRUCTORS
     PM_QUATERNION(PM_CCONST PM_QUATERNION & quat);	/* added 7-May-1997
 							   by WPS */
@@ -274,7 +274,7 @@ struct PM_QUATERNION {
 struct PM_EULER_ZYZ {
     /* ctors/dtors */
     PM_EULER_ZYZ() {
-    };
+    }
 #ifdef INCLUDE_POSEMATH_COPY_CONSTRUCTORS
     PM_EULER_ZYZ(PM_CCONST PM_EULER_ZYZ & zyz);
 #endif
@@ -294,7 +294,7 @@ struct PM_EULER_ZYZ {
 struct PM_EULER_ZYX {
     /* ctors/dtors */
     PM_EULER_ZYX() {
-    };
+    }
 #ifdef INCLUDE_POSEMATH_COPY_CONSTRUCTORS
     PM_EULER_ZYX(PM_CCONST PM_EULER_ZYX & zyx);
 #endif
@@ -314,7 +314,7 @@ struct PM_EULER_ZYX {
 struct PM_RPY {
     /* ctors/dtors */
     PM_RPY() {
-    };
+    }
 #ifdef INCLUDE_POSEMATH_COPY_CONSTRUCTORS
     PM_RPY(PM_CCONST PM_RPY PM_REF rpy);	/* added 7-May-1997 by WPS */
 #endif
@@ -334,7 +334,7 @@ struct PM_RPY {
 struct PM_POSE {
     /* ctors/dtors */
     PM_POSE() {
-    };
+    }
 #ifdef INCLUDE_POSEMATH_COPY_CONSTRUCTORS
     PM_POSE(PM_CCONST PM_POSE & p);
 #endif
@@ -356,7 +356,7 @@ struct PM_POSE {
 struct PM_HOMOGENEOUS {
     /* ctors/dtors */
     PM_HOMOGENEOUS() {
-    };
+    }
 #ifdef INCLUDE_POSEMATH_COPY_CONSTRUCTORS
     PM_HOMOGENEOUS(PM_CCONST PM_HOMOGENEOUS & h);
 #endif
@@ -376,7 +376,7 @@ struct PM_HOMOGENEOUS {
 struct PM_LINE {
     /* ctors/dtors */
     PM_LINE() {
-    };
+    }
 #ifdef INCLUDE_POSEMATH_COPY_CONSTRUCTORS
     PM_LINE(PM_CCONST PM_LINE &);
 #endif
@@ -396,7 +396,7 @@ struct PM_LINE {
 struct PM_CIRCLE {
     /* ctors/dtors */
     PM_CIRCLE() {
-    };
+    }
 #ifdef INCLUDE_POSEMATH_COPY_CONSTRUCTORS
     PM_CIRCLE(PM_CCONST PM_CIRCLE &);
 #endif
@@ -686,6 +686,7 @@ extern "C" {
 
 #define pmClose(a, b, eps) ((fabs((a) - (b)) < (eps)) ? 1 : 0)
 #define pmSq(x) ((x)*(x))
+#define pmCb(x) ((x)*(x)*(x))
 
 #ifdef TO_DEG
 #undef TO_DEG
@@ -770,10 +771,14 @@ extern "C" {
 /* global error number and errors */
     extern int pmErrno;
     extern void pmPerror(const char *fmt);
-#define PM_ERR             -1	/* unspecified error */
-#define PM_IMPL_ERR        -2	/* not implemented */
-#define PM_NORM_ERR        -3	/* arg should have been norm */
-#define PM_DIV_ERR         -4	/* divide by zero error */
+
+    typedef enum {
+        PM_DIV_ERR = -4, /* divide by zero error */
+        PM_NORM_ERR = -3, /* arg should have been norm */
+        PM_IMPL_ERR = -2, /* not implemented */
+        PM_ERR = -1, /* unspecified error */
+        PM_OK = 0
+    } PosemathErrCode;
 
 /* Scalar functions */
 

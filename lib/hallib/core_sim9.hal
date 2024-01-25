@@ -6,9 +6,6 @@ loadrt trivkins
 # motion controller, get name and thread periods from ini file
 loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[TRAJ]AXES
 # load 6 differentiators (for velocity and accel signals
-loadrt ddt names=ddt_x,ddt_xv,ddt_y,ddt_yv,ddt_z,ddt_zv
-# load additional blocks
-loadrt hypot names=vel_xy,vel_xyz
 
 # add motion controller functions to servo thread
 addf motion-command-handler servo-thread

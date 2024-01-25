@@ -1,5 +1,4 @@
-G20
-G64
+o<default_inch> call
 G0 X1 Y0 Z0
 G0 X0
 G1 X1.724638 Y-1.012731 F999

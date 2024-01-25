@@ -177,6 +177,7 @@ extern "C" {
         EMCMOT_SET_OFFSET, /* set tool offsets */
         EMCMOT_SET_MAX_FEED_OVERRIDE,
         EMCMOT_SETUP_ARC_BLENDS,
+        EMCMOT_SETUP_CONSISTENCY_CHECKS,
     } cmd_code_t;
 
 /* this enum lists the possible results of a command */
@@ -194,6 +195,11 @@ extern "C" {
 #define EMCMOT_TERM_COND_BLEND 2
 #define EMCMOT_TERM_COND_TANGENT 3
 
+typedef struct {
+    // Consistency checking within TP
+    int extraConsistencyChecks;
+    double maxPositionDriftError;
+} consistency_check_config_t;
 /*********************************
        COMMAND STRUCTURE
 *********************************/
@@ -215,10 +221,15 @@ extern "C" {
 	double vel;		/* max velocity */
         double ini_maxvel;      /* max velocity allowed by machine
                                    constraints (the ini file) */
+        int pure_angular;       // Canon decided this move should be treated as an angular move (may have small XYZUVW motion anyway)
         int motion_type;        /* this move is because of traverse, feed, arc, or toolchange */
         double spindlesync;     /* user units per spindle revolution, 0 = no sync */
+        double spindle_speed;		/* commanded spindle speed */
+        double css_factor; // Only used during CSS mode
+        double css_xoffset; // Only used during CSS mode
 	double acc;		/* max acceleration */
-	double backlash;	/* amount of backlash */
+    double acc_normal;		/* max normal acceleration (circular moves only)*/
+    double backlash;	/* amount of backlash */
 	int id;			/* id for motion */
 	int termCond;		/* termination condition */
 	double tolerance;	/* tolerance for path deviation in CONTINUOUS mode */
@@ -256,6 +267,9 @@ extern "C" {
         double arcBlendRampFreq;
         double arcBlendTangentKinkRatio;
         double maxFeedScale;
+
+    consistency_check_config_t consistencyCheckConfig;
+
     } emcmot_command_t;
 
 /*! \todo FIXME - these packed bits might be replaced with chars
@@ -544,17 +558,21 @@ Suggestion: Split this in to an Error and a Status flag register..
 	double big_vel;		/* used for "debouncing" velocity */
     } emcmot_joint_t;
 
-/* This structure contains only the "status" data associated with
-   a joint.  "Status" data is that data that should be reported to
-   user space on a continuous basis.  An array of these structs is
-   part of the main status structure, and is filled in with data
-   copied from the emcmot_joint_t structs every servo period.
+typedef enum {
+    SPINDLE_REVERSE=-1,
+    SPINDLE_STOPPED=0,
+    SPINDLE_FORWARD=1
+} spindle_direction_code_t;
 
-   For now this struct contains more data than it really needs, but
-   paring it down will take time (and probably needs to be done one
-   or two items at a time, with much testing).  My main goal right
-   now is to get get the large joint struct out of status.
-
+/**
+ * This structure contains only the "status" data associated with a joint.
+ * "Status" data is that data that should be reported to user space on a
+ * continuous basis.  An array of these structs is part of the main status
+ * structure, and is filled in with data copied from the emcmot_joint_t structs
+ * every servo period.  For now this struct contains more data than it really
+ * needs, but paring it down will take time (and probably needs to be done one
+ * or two items at a time, with much testing).  My main goal right now is to
+ * get get the large joint struct out of status.
 */
     typedef struct {
 
@@ -580,16 +598,21 @@ Suggestion: Split this in to an Error and a Status flag register..
 
 
     typedef struct {
-	double speed;		// spindle speed in RPMs
+    double velocity_rpm_out;
 	double css_factor;
 	double xoffset;
-	int direction;		// 0 stopped, 1 forward, -1 reverse
 	int brake;		// 0 released, 1 engaged
 	int locked;             // spindle lock engaged after orient
 	int orient_fault;       // fault code from motion.spindle-orient-fault
 	int orient_state;       // orient_state_t
-    } spindle_status;
+    } spindle_cmd_status;
     
+    typedef struct {
+    double position_rev;
+    double velocity_rpm;
+    int index_enable;  /* hooked to a canon encoder index-enable */
+    int synced;        /* we are doing spindle-synced motion */
+    } spindle_fb_status;
 
 /*********************************
         STATUS STRUCTURE
@@ -647,12 +670,12 @@ Suggestion: Split this in to an Error and a Status flag register..
         unsigned char probe_type;
 	EmcPose probedPos;	/* Axis positions stored as soon as possible
 				   after last probeTripped */
-        int spindle_index_enable;  /* hooked to a canon encoder index-enable */
-        int spindleSync;        /* we are doing spindle-synced motion */
-        double spindleRevs;     /* position of spindle in revolutions */
-        double spindleSpeedIn;  /* velocity of spindle in revolutions per minute */
 
-	spindle_status spindle;	/* data types for spindle status */
+	spindle_cmd_status spindle_cmd;	/* Spindle command output from motion */
+	spindle_fb_status spindle_fb;	/* Spindle feedback input to motion */
+    double spindle_tracking_gain; // external control of position trakcing aggressiveness
+    int pos_tracking_mode;
+    double pos_tracking_error;
 	
 	int synch_di[EMCMOT_MAX_DIO]; /* inputs to the motion controller, queried by g-code */
 	int synch_do[EMCMOT_MAX_DIO]; /* outputs to the motion controller, queried by g-code */
@@ -750,6 +773,7 @@ Suggestion: Split this in to an Error and a Status flag register..
         double arcBlendRampFreq;
         double arcBlendTangentKinkRatio;
         double maxFeedScale;
+    consistency_check_config_t consistencyCheckConfig;
     } emcmot_config_t;
 
 /*********************************
