@@ -131,6 +131,9 @@ ifeq (,$(filter nodocs,$(DEB_BUILD_OPTIONS)))
 		$(RM) debian/tmp/usr/share/doc/linuxcnc/LinuxCNC_*_$$l.pdf; \
 	done
 	$(RM) debian/tmp/usr/share/doc/linuxcnc/*_es.adoc
+else
+	# Avoiding error message because of examples
+	$(RM) -fr debian/tmp/usr/share/doc/
 endif
 
 override_dh_compress:
