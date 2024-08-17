@@ -59,7 +59,8 @@ $ git clone https://github.com/LinuxCNC/linuxcnc.git linuxcnc-source-dir
   This is called a "clone" of the LinuxCNC repository.
   The advantage is that this local clone supports the communication about changes you may decide to perform on the source tree.
 
-GitHub is an infrastructure on its own and explained in depth elsewhere. Just to get you motivated if you do not know it already.offers to perform a clone for you and have that instance made publicly available.
+GitHub is an infrastructure on its own and explained in depth elsewhere.
+Just to get you motivated if you do not know it already.offers to perform a clone for you and have that instance made publicly available.
 GitHub refers to such an additional instance of another repository as a "fork".
 You can easily (and at no cost) create a fork of the LinuxCNC git repository at GitHub, and use that to track and publish your changes.
 After creating your own GitHub fork of LinuxCNC, clone it to your development machine and proceed with your hacking as usual.
@@ -72,12 +73,13 @@ GitHub makes this sharing very easy: After you polish your changes and push them
 
 For the impatient, try this:
 
+[source,console]
 ----
 $ git clone https://github.com/LinuxCNC/linuxcnc.git linuxcnc-source-dir
 $ cd linuxcnc-source-dir/src
-$ ./autogen.sh
-$ ./configure --with-realtime=uspace
-$ make
+$ ./debian/configure
+$ sudo apt-get build-dep .
+$ DEB_BUILD_OPTIONS=nocheck dpkg-buildpackage -uc -B
 ----
 
 That will probably fail!  That doesn't make you a bad person,
@@ -87,12 +89,14 @@ Especially the section on <<Satisfying-Build-Dependencies,Satisfying Build Depen
 If you are running on a realtime-capable system (such as an install from the LinuxCNC Live/Install Image,
 see the <<sub:realtime,Realtime>> section below), one extra build step is needed at this time:
 
------
+[source,console]
+----
 $ sudo make setuid
------
+----
 
 After you have successfully built LinuxCNC it is time to run the tests:
 
+[source,console]
 -----
 $ source ../scripts/rip-environment
 $ runtests
@@ -165,10 +169,11 @@ The `src/configure` script configures how the source code will be compiled.
 It takes many optional arguments.
 List all arguments to `src/configure` by running this:
 
------
+[source,console]
+----
 $ cd linuxcnc-source-dir/src
 $ ./configure --help
------
+----
 
 The most commonly used arguments are:
 
@@ -212,10 +217,11 @@ Building just a specific target::
   If you want to build just a specific part of LinuxCNC, you can name the thing you want to build on the `make` command line.
   For example, if you are working on a component named `froboz`, you can build its executable by running:
 +
------
+[source,console]
+----
 $ cd linuxcnc-source-dir/src
 $ make ../bin/froboz
------
+----
 
 === Building Debian Packages
 
@@ -249,6 +255,7 @@ that are detailed below:
 
 Build tools have been gathered as a virtual package named `build-essential`. To install it, run:
 
+[source,console]
 ----
 $ sudo apt-get install build-essential
 ----
@@ -257,6 +264,7 @@ Once those prerequisites are met, building the Debian packages consists of two s
 
 The first step is generating the Debian package scripts and meta-data from the git repo by running this:
 
+[source,console]
 ----
 $ cd linuxcnc-dev
 $ ./debian/configure
@@ -274,6 +282,7 @@ to minimize latencies.
 
 Once the Debian package scripts and meta-data are configured, build the package by running `dpkg-buildpackage`:
 
+[source,console]
 ----
 $ dpkg-buildpackage -b -uc
 ----
@@ -338,6 +347,7 @@ You can use this meta-data to easily list the required packages missing from you
 First, go to the source tree of LinuxCNC and initiate its default self-configuration,
 if not already performed:
 
+[source,console]
 -----
 $ cd linuxcnc-dev
 $ ./debian/configure
@@ -350,6 +360,7 @@ the build-dependencies for those to-be-created packages.
 The most straightforward way to get all build-dependencies installed is to just
 execute (from the same directory):
 
+[source,console]
 ----
 sudo apt-get build-dep .
 ----
@@ -369,9 +380,10 @@ what's missing.
 
 First, install the `dpkg-checkbuilddeps` program by running:
 
------
+[source,console]
+----
 $ sudo apt-get install dpkg-dev
------
+----
 
 This generates the file `debian/control` in a user-readable yaml-format
 which lists the build-dependencies close to the top.
@@ -388,9 +400,10 @@ If you are new to Linux and git version management, a clean start may be prefera
 The `dpkg-checkbuilddeps` (also from the dpkg-dev package that is installed as part of the build-essential dependencies) program
 can be asked to do its job (note that it needs to run from the `linuxcnc-source-dir` directory, *not* from `linuxcnc-source-dir/debian`):
 
------
+[source,console]
+----
 $ dpkg-checkbuilddeps
------
+----
 
 It will emit a list of packages that are required to build LinuxCNC on your system but are not installed, yet.
 You can now install missing build-dependencies
@@ -425,6 +438,7 @@ Set it to
   You should not set this option to gain some extra confidence in your build to perform as expected unless you are running into mere technical difficulties with the test-specific software dependencies.
 
 An environment variable can be set together with the execution of the command, e.g.
+[source,console]
 ----
 DEB_BUILD_OPTIONS=nocheck dpkg-buildpackage -uc -B
 ----
@@ -437,6 +451,7 @@ The tool installing it, `dpkg` is part of every Debian installation.
 The .deb files created by `dpkg-buildpackage` are found in the directory above the linuxcnc-source-dir, i.e. in `..`.
 To see what files are provided in a package, run
 
+[source,console]
 ----
 dpkg -c ../linuxcnc-uspace*.deb
 ----
@@ -448,6 +463,7 @@ Quit with "q".
 
 To install the packages, run
 
+[source,console]
 ----
 sudo dpkg -i ../linuxcnc*.deb
 ----
@@ -485,6 +501,7 @@ The file should contain the following line:
 Log out and log back in to make the changes take effect.
 Verify that the memory lock limit is raised using the following command:
 
+[source,console]
 -----
 $ ulimit -l
 -----
@@ -495,6 +512,7 @@ Building on Gentoo is possible, but not supported.  Be sure you are
 running a desktop profile.  This project uses the Tk Widget Set, asciidoc,
 and has some other dependencies.  They should be installed as root:
 
+[source,console]
 -----
 ~ # euse -E tk imagequant
 ~ # emerge -uDNa world
@@ -507,6 +525,7 @@ You can switch back to being a normal user for most of the rest of the
 install.  As that user, create a virtual environment for pip, then install
 the pip packages:
 
+[source,console]
 -----
 ~/src $ python -m venv   --system-site-packages ~/src/venv
 ~/src $ . ~/src/venv/bin/activate
@@ -516,6 +535,7 @@ the pip packages:
 
 Then you can contrinue as normally:
 
+[source,console]
 -----
 (venv) ~/src $ git clone https://github.com/LinuxCNC/linuxcnc.git
 (venv) ~/src $ cd linuxcnc
@@ -529,6 +549,7 @@ There is no need to run "make suid", just make sure your user is in
 the "dialout" group.  To start linuxcnc, you must be in the Python
 Virtual Environment, and set up the linuxcnc environment:
 
+[source,console]
 -----
 ~ $ . ~/src/venv/bin/activate
 (venv) ~ $ . ~/src/linuxcnc/scripts/rip-environment

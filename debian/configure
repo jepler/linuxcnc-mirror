@@ -195,7 +195,7 @@ fi
 
 
 rm -f ../build-stamp
-echo "successfully configured for '$DISTRIB_NAME'.."
+echo "I: Successfully configured for '$DISTRIB_NAME'."
 
 echo "I: You can now start the build of LinuxCNC Debian packages."
 echo "   To build and test everything: fakeroot debian/rules binary"
