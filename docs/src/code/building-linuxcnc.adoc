@@ -77,9 +77,9 @@ For the impatient, try this:
 ----
 $ git clone https://github.com/LinuxCNC/linuxcnc.git linuxcnc-source-dir
 $ cd linuxcnc-source-dir/src
-$ ./debian/configure
-$ sudo apt-get build-dep .
-$ DEB_BUILD_OPTIONS=nocheck dpkg-buildpackage -uc -B
+$ ./autogen.sh
+$ ./configure --with-realtime=uspace
+$ make
 ----
 
 That will probably fail!  That doesn't make you a bad person,
@@ -240,10 +240,17 @@ delivery to end users, and when building the software for a machine
 that does not have the build environment installed, or that does not have
 internet access.
 
-To build packages is primarily useful when packaging the software for delivery to end users.
-Developers among themselves exchange only the source code, likely supported by the LinuxCNC GitHub repository referenced below.
-Also, when building the software for a machine that doesn't have the build environment installed,
-or that doesn't have internet access, one happily accepts a prebuilt package.
+For the impatient, try this:
+
+[source,console]
+----
+$ sudo apt-get install build-essential
+$ git clone https://github.com/LinuxCNC/linuxcnc.git linuxcnc-source-dir
+$ cd linuxcnc-source-dir/src
+$ ./debian/configure
+$ sudo apt-get build-dep .
+$ DEB_BUILD_OPTIONS=nocheck dpkg-buildpackage -uc -B
+----
 
 Building Debian packages is performed with the `dpkg-buildpackage` tool that is
 provided by the `dpkg-dev` package. Its execution comes with a series of prerequisites
