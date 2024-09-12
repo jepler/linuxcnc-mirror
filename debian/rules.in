@@ -32,7 +32,9 @@ export TIME=$(shell LANG=C date --date='@$(TIMESTAMP)' '+%T')
 
 kernel_version = @KERNEL_VERSION@
 configure_realtime_arg = @CONFIGURE_REALTIME_ARG@
+ifeq (,$(filter nodocs,$(DEB_BUILD_OPTIONS)))
 enable_build_documentation = @ENABLE_BUILD_DOCUMENTATION@
+endif
 SRCDIR = $(CURDIR)/src
 DESTDIR=$(CURDIR)/debian/tmp
 DEV_PACKAGE_NAME=@MAIN_PACKAGE_NAME@-dev
@@ -55,10 +57,12 @@ override_dh_auto_build-arch:
 	dh_auto_build -- build-software
 
 override_dh_auto_build-indep:
+ifeq (,$(filter nodocs,$(DEB_BUILD_OPTIONS)))
 ifneq "$(enable_build_documentation)" ""
 	dh_auto_build -- manpages
 	dh_auto_build -- translateddocs
 	dh_auto_build -- docs
+endif
 endif
 
 override_dh_auto_clean:
@@ -66,6 +70,11 @@ override_dh_auto_clean:
 	dh_auto_clean; \
 	py3clean .; \
 	fi
+
+override_dh_auto_test:
+ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
+	dh_auto_test
+endif
 
 override_dh_auto_install-arch:
 	# Install all architecture-dependent libraries and executables
@@ -79,27 +88,30 @@ override_dh_auto_install-arch:
 	rm -f $(DESTDIR)/usr/share/doc/@MAIN_PACKAGE_NAME@/examples/sample-configs/*/*position*.txt
 
 override_dh_installdocs-arch:
+ifeq (,$(filter nodocs,$(DEB_BUILD_OPTIONS)))
 	# Sample configs go in `usr/share/doc/linuxcnc` (not `.../doc/@MAIN_PACKAGE_NAME@`)
-	# because that's where the `linuxcnc` launcher script looks for them,
+	# because that's where the  `linuxcnc` launcher script looks for them,
 	# and that's inconvenient to change.
 	dh_installdocs --doc-main-package=@MAIN_PACKAGE_NAME@ --package=@MAIN_PACKAGE_NAME@
 	mkdir -p debian/@MAIN_PACKAGE_NAME@/usr/share/doc/linuxcnc
 	mv debian/@MAIN_PACKAGE_NAME@/usr/share/doc/@MAIN_PACKAGE_NAME@/examples debian/@MAIN_PACKAGE_NAME@/usr/share/doc/linuxcnc
 
 	dh_installdocs --doc-main-package=@MAIN_PACKAGE_NAME@ --package=@MAIN_PACKAGE_NAME@-dev
-
+endif
 
 override_dh_auto_install-indep:
+ifeq (,$(filter nodocs,$(DEB_BUILD_OPTIONS)))
 	DESTDIR=$(DESTDIR) $(MAKE) -C src install-docs install-doc
 	# Remove the docs we just built that we don't have debs for yet...
 	rm -f $(DESTDIR)/usr/share/doc/linuxcnc/*_nb.pdf
+endif
 
 override_dh_installdocs-indep:
+ifeq (,$(filter nodocs,$(DEB_BUILD_OPTIONS)))
 	# The G-code quick reference html docs are built as `docs/html/${LANG}/gcode.html`.
-	# We install them into `/usr/share/doc/@MAIN_PACKAGE_NAME@/` in each
-	# linuxcnc-doc-${LANG} package, then rename them there (except
-	# for the English one) to include the language in the filename,
-	# so they don't collide when we install all the doc debs.
+	# We install them into `/usr/share/doc/@MAIN_PACKAGE_NAME@/` in each # linuxcnc-doc-${LANG} package,
+	# then rename them there (except for the English one) to include the language in the filename,
+	# so they do not collide when we install all the doc debs.
 	#
 	# Rename the "main" doc directories from
 	# `usr/share/doc/@MAIN_PACKAGE_NAME@` to `usr/share/doc/linuxcnc`,
@@ -116,8 +128,10 @@ override_dh_installdocs-indep:
 		$(RM) debian/tmp/usr/share/doc/linuxcnc/LinuxCNC_*_$$l.pdf; \
 	done
 	$(RM) debian/tmp/usr/share/doc/linuxcnc/*_es.adoc
-
-
+else
+	# Avoiding error message because of examples
+	$(RM) -fr debian/tmp/usr/share/doc/
+endif
 
 override_dh_compress:
 	dh_compress -X.pdf -X.txt -X.hal -X.ini -X.clp -X.var -X.nml -X.tbl -X.xml -Xsample-configs

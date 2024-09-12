@@ -195,4 +195,11 @@ fi
 
 
 rm -f ../build-stamp
-echo "successfully configured for '$DISTRIB_NAME'.."
+echo "I: Successfully configured for '$DISTRIB_NAME'."
+
+echo "I: You can now start the build of LinuxCNC Debian packages."
+echo "   To build and test everything: fakeroot debian/rules binary"
+echo "   To build the executables and man pages only: fakeroot debian/rules binary-arch"
+echo "   To avoid tests: DEB_BUILD_OPTIONS=nocheck debian/rules binary"
+echo "   To avoid documentation: DEB_BUILD_OPTIONS=nodocs fakeroot debian/rules binary"
+echo "   The DEB_BUILD_OPTIONS environment variable also works with dpkg-buildpackage."

@@ -10,12 +10,12 @@ Build-Depends:
     @KERNEL_HEADERS@,
     @MODUTILS_DEPENDS@,
     @EXTRA_BUILD@,
-    docbook-xsl,
+    docbook-xsl <!nodocs>,
     asciidoc,
-    ghostscript,
-    groff-base,
-    imagemagick,
-    asciidoc-dblatex,
+    ghostscript <!nodocs>,
+    groff-base <!nodocs>,
+    imagemagick <!nodocs>,
+    asciidoc-dblatex <!nodocs>,
     autoconf,
     automake,
     bwidget (>= 1.7),
@@ -34,7 +34,7 @@ Build-Depends:
     libusb-1.0-0-dev,
     libxmu-dev,
     netcat-traditional | netcat-openbsd | netcat,
-    po4a,
+    po4a <!nodocs>,
     procps,
     psmisc,
     python3,
@@ -44,12 +44,12 @@ Build-Depends:
     tcl@TCLTK_VERSION@-dev,
     tclx,
     tk@TCLTK_VERSION@-dev,
-    xvfb,
+    xvfb <!nocheck>,
     yapps2
 Build-Depends-Indep:
     @DOC_DEPENDS@,
-Build-Conflicts: libjpeg8-dev, libtiff4-dev
-Standards-Version: 4.6.1
+Build-Conflicts-Arch: libjpeg8-dev, libtiff4-dev
+Standards-Version: 4.7.0
 Homepage: https://linuxcnc.org/
 Vcs-Browser: https://github.com/LinuxCNC/linuxcnc
 Vcs-Git: https://github.com/LinuxCNC/linuxcnc.git
@@ -69,23 +69,23 @@ Section: devel
 Description: PC based motion controller for real-time Linux
  LinuxCNC is a fully-realised CNC machine controller that can interpret
  machine-control programs (such as G-code), plan trajectories and finally
- output low-level signals to machine control hardware
+ output low-level signals to machine control hardware.
  .
- LinuxCNC is modular and in principle the HAL (hardware abstraction layer),
- pluggable interpreters and variety of hardware drivers mean that it can
- control almost any software-defined physical system.
+ LinuxCNC is modular, thus in principle its HAL (hardware abstraction
+ layer) together with pluggable interpreters and variety of hardware
+ drivers can control almost any software-defined physical system.
  .
  LinuxCNC relies on a realtime kernel to support real-time motion control,
- typically updating the position waypoints every 1mS and reacting to
- input within tens of microseconds.
+ typically updating the position waypoints every millisecond and reacting
+ to input within tens of microseconds.
  .
  Modules exist to use the low-level parts of LinuxCNC as a motion-control
  client for OpenPnP. Interfaces exist for ROS (the Robot Operating System)
  with which LinuxCNC has considerable overlap.
  .
  LinuxCNC supports arbitrary kinematics (the mapping between coordinate
- space and actuator space) and can control both parallel (eg Stewart
- platform) and serial (eg robot arm) systems in addition to conventional
+ space and actuator space) and can control both parallel (e.g., Stewart
+ platform) and serial (e.g., robot arm) systems in addition to conventional
  cartesian machine tools.
  .
  LinuxCNC supports 9 cartesian axes and 16 "Joints" (individual actuators)
