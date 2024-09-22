@@ -49,6 +49,8 @@ from collections import OrderedDict # needed for proper jog button arrangement
 from time import strftime  # needed for the clock in the GUI
 #from Gtk._Gtk import main_quit
 
+from gladevcp.zmqnetwork import ZMQSendReceive
+
 # Throws up a dialog with debug info when an error is encountered
 def excepthook(exc_type, exc_obj, exc_tb):
     try:
@@ -167,6 +169,9 @@ class gmoccapy(object):
         # initial poll, so all is up to date
         self.stat.poll()
         self.error_channel.poll()
+
+        self.zmqmessage = ZMQSendReceive(self.external_call)
+        self.zmqmessage.init_zmq_subscribe()
 
         self.builder = Gtk.Builder()
         # translation of the glade file will be done with
@@ -3987,6 +3992,21 @@ class gmoccapy(object):
             text = "Vc= {0:.2f}".format(vc)
         self.widgets.lbl_vc.set_text(text)
 
+    def external_reload(self, path):
+        print('gmoccapy external reload:',path)
+        if path is None:
+            self.widgets.hal_action_reload.emit("activate")
+        else:
+            # use a little hack to load a specific file
+            self.widgets.hal_action_reload._load_file(path)
+
+    # qualify a ZMQ message and if good, call the function
+    def external_call(self, topic, function, args):
+        print('gmoccapy ext call:',topic, function, args)
+        # allow reloading of files
+        if function == 'external_reload':
+            self.external_reload(args[0])
+
     def on_rbt_forward_clicked(self, widget, data=None):
         if widget.get_active():
             widget.set_image(self.widgets.img_spindle_forward_on)
@@ -5790,6 +5810,12 @@ class gmoccapy(object):
         hal_glib.GPin(pin).connect("value_changed", self._optional_blocks)
         pin = self.halcomp.newpin("blockdelete", hal.HAL_BIT, hal.HAL_IN)
         hal_glib.GPin(pin).connect("value_changed", self._blockdelete)
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+    def __setitem__(self, item, value):
+        return setattr(self, item, value)
 
 
 # Hal Pin Handling End
