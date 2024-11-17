@@ -1,0 +1,250 @@
+:lang: en
+:toc:
+
+[[cha:qtvcp]]
+= GUI Development Reference
+
+// Custom lang highlight
+// must come after the doc title, to work around a bug in asciidoc 8.6.6
+:ini: {basebackend@docbook:'':ini}
+:hal: {basebackend@docbook:'':hal}
+:ngc: {basebackend@docbook:'':ngc}
+:css: {basebackend@docbook:'':css}
+
+This document attempts to be a 'best practices' reference for general use screen development. +
+While it's possible to program just about anything to work with linuxcnc, using common frame work,
+ language and configuration requirements allows easier transition between screens and more developers 
+to maintain them. +
+That said, nothing in this document is written in stone.
+
+== Language
+Python is currently the preferred language of linuxcnc's screen code. +
+Python has a low entry bar for new users to modify the screens to suit them. +
+Python has a rich array of documentation, tutorials and libraries to pull from. + 
+It is already used and integrated into linuxcnc's system requirements. +
+While C or C\++ could be used, it severely limits who can maintain and develop them. +
+It would be better to extend python with C/C++ modules for whatever function that requires it.
+
+== Basic Configuration
+Currently, most screens use a combination of INI file and preference file entries to configure their functions. +
+INi text files are usually used for the common machine controller settings, while text based preference files 
+are used for more GUI related properties (such as sounds, size, colors). +
+There can be other files used for translations, stylizing and function customization. These are highly dependant 
+on the underlying widget toolkit.
+
+=== INI [DISPLAY]
+The *[DISPLAY]* section of the INI is for specifying screen related settings. +
+
+==== Display
+The most important of is specifying the name of the screen that the linuxcnc script will use to load. +
+The screen program usually recognizes switches such as to set full screen. +
+Title is for the window title and icon is used for iconizing the window.
+
+[source,{ini}]
+----
+[DISPLAY]
+DISPLAY = axis
+TITLE = XYZA Rotational Axis
+ICON = silver_dragon.png
+----
+
+==== Cycle Time
+If settable, this is how to set the cycle time of the display GUI. +
+This is often the update rate rather then sleep time between updates. +
+A value of 100 ms (0.1 s) is a common setting though a range of 50 - 200 ms is not unheard of.
+
+[source,{ini}]
+----
+[DISPLAY]
+CYCLE_TIME = 100
+----
+
+==== File Paths
+If these functions are available in the screen here is how to specify the path to use. +
+These should reference from the current INI file, or allow '~' for the home folder, or allow use of absolute paths.
+
+[source,{ini}]
+----
+MDI_HISTORY_FILE = mdi_history.txt
+PREFERENCE_FILE_PATH = gui.pref
+LOG_FILE = gui-log.txt
+----
+
+==== Jog Increments
+Radio buttons or a combobox are generally used for increments selection. +
+The linear increments can be a mix of inches or millimeters. +
+Angular increments are specified in degrees. +
+The word 'continuous' is used to specify continuous jogging and probably should be added even if left out of the INI line.
+
+[source,{ini}]
+----
+INCREMENTS = continuous, 10 mm, 1.0 mm, 0.10 mm, 0.01 mm, 1.0 inch, 0.1 inch, 0.01 inch
+ANGULAR_INCREMENTS = continuous, .5, 1, 45, 90, 360
+----
+
+==== Machine Type Hint
+The screen often needs to be adjusted based on machine type. Lathes have different controls and display DROs 
+differently. Foam machine display the plot differently. +
+The old way to do this was adding switches LATHE = 1, FOAM = 1 etc
+
+[source,{ini}]
+----
+MACHINE_TYPE_HINT = LATHE
+----
+
+==== Overrides
+Overrides allows the user to adjust feed rate or spindle speed on the fly. Usually a slider or dial is used. +
+These settings are in percent.
+
+[source,{ini}]
+----
+MAX_FEED_OVERRIDE       = 120
+MIN_SPINDLE_0_OVERRIDE    = 50
+MAX_SPINDLE_0_OVERRIDE    = 120
+----
+
+==== Jog Rate
+Most screens have slider controls to adjust the linear and angular jog speed rate, +
+These settings should be specified in machine units per minute for linear and degrees per minute for angular +
+'Default' refers to the starting rate when the screen is first loaded.
+
+[source,{ini}]
+----
+DEFAULT_LINEAR_VELOCITY =
+MIN_LINEAR_VELOCITY =
+MAX_LINEAR_VELOCITY =
+
+DEFAULT_ANGULAR_VELOCITY = 
+MIN_ANGULAR_VELOCITY = 
+MAX_ANGULAR_VELOCITY = 
+----
+
+==== Spindle Manual Controls
+Manual controls for spindle control could be, (or a combinations of) buttons, sliders or dials +
+You can set limits that are less then the what the machine controller can utilize by setting these entries. +
+If your screen is capable of running multiple spindles, then should accept entries higher then the shown '_0_'
+
+[source,{ini}]
+----
+SPINDLE_INCREMENT = 100
+DEFAULT_SPINDLE_0_SPEED = 500
+MIN_SPINDLE_0_SPEED = 50
+MAX_SPINDLE_0_SPEED = 1000
+----
+
+=== INI [MDI_COMMAND]
+Some screens use buttons to run 'Macro' NGC commands. +
+They can be specified like these compact examples. +
+NGC commands separated by colons are run to completion before the next. +
+The optional comma separates text for the button from the NGC code.
+
+[source,{ini}]
+----
+[MDI_COMMAND_LIST]
+MDI_COMMAND_MACRO0 = G0 Z25;X0 Y0;Z0, Goto\nUser\nZero
+MDI_COMMAND_MACRO1 = G53 G0 Z0;G53 G0 X0 Y0,Goto\nMachn\nZero
+----
+
+=== INI [FILTER]
+This sction allows setting of what files are shown in the file chooser and 
+what filter programs will preprocess it's output before sending it to linuxcnc. +
+The extensions are follows this pattern: +
+PROGRAM_EXTENSION = .extension,.extension2[space]Description of extensions +
+The filter program definitions are such: +
+filter extension = program to run
+
+[source,{ini}]
+----
+[FILTER]
+# Controls what programs are shown in the file manager
+PROGRAM_EXTENSION = .ngc,.nc,.tap G-Code File (*.ngc,*.nc,*.tap)
+PROGRAM_EXTENSION = .png,.gif,.jpg Greyscale Depth Image
+PROGRAM_EXTENSION = .py Python Script
+
+# specifies what special 'filter' programs runs based on program ending
+png = image-to-gcode
+gif = image-to-gcode
+jpg = image-to-gcode
+py = python3
+----
+
+=== INI [HAL]
+Most screens will need some HAL pins. They need to be connected after the screen creates them.+
+
+==== Postgui Halfile
+These files should be run one after another in order, after all the GUI HAL pins have been made.
+
+[source,{ini}]
+----
+[HAL]
+POSTGUI_HALFILE = keypad_postgui.hal
+POSTGUI_HALFILE = vfd_postgui.hal
+----
+
+==== Postgui Halcmd
+These files should be run one after another in order, after all the POSTGUI files have been run.
+
+[source,{ini}]
+----
+[HAL]
+POSTGUI_HALCMD = show pin qt
+POSTGUI_HALCMD = loadusr halmeter
+----
+
+== Extended Configuration
+
+=== Embedding GUI Elements
+Allowing users to build small panels independently, that can be embedded into the main screen 
+is a common and very useful customization. Some screens allow embedding of 3rd party foreign programs, 
+others only the native widget toolkit based panels. +
+Usually these are embedded in tabs or side panel widgets. +
+This is how to describe the optional title, loading command and widget name location: +
+
+[source,{ini}]
+----
+EMBED_TAB_NAME=Vismach demo
+EMBED_TAB_COMMAND=qtvcp vismach_mill_xyz
+EMBED_TAB_LOCATION=tabWidget_utilities
+----
+=== User Message Dialogs
+User dialogs are used for popping up import information (usually errors), that the user deems important. +
+Some stay up till the problem is fixed, some require acknowledgement, others a yes/no choice. +
+
+[source,{ini}]
+----
+[DISPLAY]
+MESSAGE_BOLDTEXT = This is an information message
+MESSAGE_TEXT = This is low priority
+MESSAGE_DETAILS = press ok to clear
+MESSAGE_TYPE = okdialog status
+MESSAGE_PINNAME = bothtest
+MESSAGE_ICON = INFO
+----
+
+[source,{ini}]
+----
+[DISPLAY]
+MULTIMESSAGE_ID = VFD
+
+MULTIMESSAGE_VFD_NUMBER = 1
+MULTIMESSAGE_VFD_TYPE = okdialog status
+MULTIMESSAGE_VFD_TITLE = VFD Error: 1
+MULTIMESSAGE_VFD_TEXT = This is the longer text FOR MESSAGE NUMBER 1
+MULTIMESSAGE_VFD_DETAILS = DETAILS for VFD error 1
+MULTIMESSAGE_VFD_ICON = WARNING
+
+MULTIMESSAGE_VFD_NUMBER = 2
+MULTIMESSAGE_VFD_TYPE = nonedialog status
+MULTIMESSAGE_VFD_TITLE = VFD Error: 2
+MULTIMESSAGE_VFD_TEXT = This is the longer text FOR MESSAGE NUMBER 2
+MULTIMESSAGE_VFD_DETAILS = DETAILS for VFD error 2
+MULTIMESSAGE_VFD_ICON = INFO
+
+MULTIMESSAGE_VFD_NUMBER = 3
+MULTIMESSAGE_VFD_TYPE = status
+MULTIMESSAGE_VFD_TITLE = VFD Error: 3
+MULTIMESSAGE_VFD_TEXT = This is the longer text FOR Error MESSAGE NUMBER 3.
+MULTIMESSAGE_VFD_DETAILS = We should do something about this message.
+MULTIMESSAGE_VFD_ICON = WARNING
+
+----

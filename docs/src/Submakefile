@@ -122,6 +122,7 @@ DOC_SRCS_EN := \
 	gui/touchy.adoc \
 	gui/gstat.adoc \
 	gui/vismach.adoc \
+	gui/gui-dev-reference.adoc \
 	hal/basic-hal.adoc \
 	hal/canonical-devices.adoc \
 	hal/comp.adoc \
