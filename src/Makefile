@@ -1430,4 +1430,16 @@ cscope:
 
 cscopeclean:
 	bash -c 'for f in `find ./ -name "cscope.*out"`;do rm $$f;done'
+
+.PHONY: format
+format: format-cpp format-python
+
+format-cpp:
+	$(ECHO) -n "formatting C/C++ files..."
+	@find -regex '.*\.\(cc\|cpp\|hpp\|cu\|c\|h\)' -exec clang-format -style=file -i "{}" \;
+	$(ECHO) "done"
+
+format-python:
+	$(ECHO) "formatting python files..."
+	@black .
 # vim:ts=8:sts=8:sw=8:noet:

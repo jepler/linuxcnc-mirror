@@ -1,0 +1,79 @@
+BasedOnStyle: LLVM
+#AccessModifierOffset: -4
+AlignAfterOpenBracket: BlockIndent
+AlignArrayOfStructures: Left
+#AlignConsecutiveAssignments: None
+#AlignConsecutiveBitFields: AcrossComments
+#AlignConsecutiveDeclarations: AcrossComments
+#AlignConsecutiveMacros: AcrossComments
+#AlignEscapedNewlines: Left
+#AlignOperands: DontAlign
+AlignTrailingComments: true
+#AllowAllArgumentsOnNextLine: false
+#AllowAllParametersOfDeclarationOnNextLine: false
+#AllowShortBlocksOnASingleLine: Always
+AllowShortCaseLabelsOnASingleLine: true
+#AllowShortEnumsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: Inline
+#AllowShortIfStatementsOnASingleLine: WithoutElse
+#AllowShortLambdasOnASingleLine: Empty
+#AllowShortLoopsOnASingleLine: false
+#AlwaysBreakAfterReturnType: None
+#AlwaysBreakTemplateDeclarations: Yes
+BinPackArguments: false
+BinPackParameters: false
+#BraceWrapping:
+#    AfterCaseLabel: false
+#    AfterClass: true
+#    AfterStruct: false
+#    AfterControlStatement: Never
+#    AfterEnum: true
+#    AfterFunction: true
+#    AfterNamespace: true
+#    AfterUnion: true
+#    BeforeCatch: true
+#    BeforeElse: false
+#    BeforeWhile: false
+#    IndentBraces: false
+#    SplitEmptyFunction: false
+#    SplitEmptyRecord: true
+#BreakBeforeBraces: Custom
+BreakBeforeBinaryOperators: None
+#BreakBeforeTernaryOperators: true
+#BreakConstructorInitializers: BeforeComma
+#BreakInheritanceList: BeforeColon
+ColumnLimit: 80
+#CompactNamespaces: false
+ContinuationIndentWidth: 4
+#IncludeBlocks: Preserve
+#IndentCaseLabels: false
+#IndentPPDirectives: None
+IndentWidth: 4
+#InsertBraces: false
+#KeepEmptyLinesAtTheStartOfBlocks: true
+MaxEmptyLinesToKeep: 2
+#NamespaceIndentation: None
+#ObjCSpaceAfterProperty: false
+#ObjCSpaceBeforeProtocolList: true
+#PackConstructorInitializers: Never
+#PointerAlignment: Left
+ReflowComments: false
+SortIncludes: Never
+#SpaceAfterCStyleCast: false
+#SpaceAfterLogicalNot: false
+#SpaceAfterTemplateKeyword: false
+#SpaceBeforeAssignmentOperators: true
+#SpaceBeforeCpp11BracedList: true
+#SpaceBeforeCtorInitializerColon: true
+#SpaceBeforeInheritanceColon: false
+#SpaceBeforeParens: ControlStatements
+#SpaceBeforeRangeBasedForLoopColon: true
+#SpaceInEmptyParentheses: false
+#SpacesBeforeTrailingComments: 2
+#SpacesInAngles: false
+#SpacesInCStyleCastParentheses: false
+#SpacesInContainerLiterals: false
+#SpacesInParentheses: false
+#SpacesInSquareBrackets: false
+TabWidth: 4
+UseTab: Never
