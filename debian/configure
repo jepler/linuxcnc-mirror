@@ -46,9 +46,9 @@ ENABLE_BUILD_DOCUMENTATION=--enable-build-documentation=pdf
 
 while test $# -ne 0; do
     case "$1" in
-    sim|uspace|noauto) echo "$1 is accepted for compatibility, but ignored";;
+    sim|uspace|noauto) echo "I: Argument $1 is accepted for compatibility, but ignored";;
     no-docs) unset ENABLE_BUILD_DOCUMENTATION ;;
-    *) echo 1>&2 "Unknown option: $1"; exit 99 ;;
+    *) echo 1>&2 "E: Unknown option: $1"; exit 99 ;;
     esac
     shift
 done
@@ -109,9 +109,9 @@ case $DISTRIB_NAME in
     Debian-10|Debian-10.*|Raspbian-10|Raspbian-10.*)
         ;;
     *)
-        echo "unknown distribution: $DISTRIB_NAME"
-        echo "detected dependencies may be incomplete or wrong"
-        echo "please consider fixing it and submitting a pull request"
+        echo "W: Unknown distribution: '$DISTRIB_NAME'."
+        echo "   Detected dependencies may be incomplete or wrong."
+        echo "   Please consider fixing it and submitting a pull request."
         ;;
 esac
 
@@ -195,4 +195,29 @@ fi
 
 
 rm -f ../build-stamp
-echo "successfully configured for '$DISTRIB_NAME'.."
+echo "I: Successfully configured for '$DISTRIB_NAME'."
+
+if which dpkg-checkbuilddeps > /dev/null; then
+
+    if [ -n "$ENABLE_BUILD_DOCUMENTATION" ]; then
+        a=$(cd .. && dpkg-checkbuilddeps || true)
+        if [ -n "$a" ]; then
+            echo "W: To successfully build all of LinuxCNC, install the following build dependencies are mising:\n$a"
+            echo "   The missing packages are auto-installed by"
+            echo "     sudo apt build-dep ."
+        else
+            echo "I: No build dependencies missing for complete builds including documentation."
+        fi
+    else
+        a=$(cd .. && dpkg-checkbuilddeps -B || true)
+        if [ -n "$a" ]; then
+            echo "I: No dependencies missing for building binaries only."
+        fi
+    fi
+else
+    echo "W: Tool to check build-dependenices not found"
+    echo "   You may want to install it as follows:"
+    echo "     sudo apt install dpkg-dev"
+    echo "   and directly execute it like this:"
+    echo "     dpkg-checkbuilddeps"
+fi
