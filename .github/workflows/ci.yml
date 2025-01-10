@@ -27,6 +27,13 @@ jobs:
         submodules: true
         fetch-depth: 0
     - run: git fetch --recurse-submodules=no https://github.com/linuxcnc/linuxcnc +refs/tags/*:refs/tags/*
+    - name: Cache APT packages
+      uses: actions/cache@v3
+      with:
+        path: /var/cache/apt
+        key: ${{ runner.os }}-apt-cache-${{ hashFiles('**/Dockerfile') }}
+        restore-keys: |
+          ${{ runner.os }}-apt-cache-
     - name: Build RIP & test
       run: |
         set -x
@@ -52,6 +59,13 @@ jobs:
         submodules: true
         fetch-depth: 0
     - run: git fetch --recurse-submodules=no https://github.com/linuxcnc/linuxcnc +refs/tags/*:refs/tags/*
+    - name: Cache APT packages
+      uses: actions/cache@v3
+      with:
+        path: /var/cache/apt
+        key: ${{ runner.os }}-apt-cache-${{ hashFiles('**/Dockerfile') }}
+        restore-keys: |
+          ${{ runner.os }}-apt-cache-
     - name: Clang build RIP & test
       run: |
         set -x
@@ -78,6 +92,13 @@ jobs:
         submodules: true
         fetch-depth: 0
     - run: git fetch --recurse-submodules=no https://github.com/linuxcnc/linuxcnc +refs/tags/*:refs/tags/*
+    - name: Cache APT packages
+      uses: actions/cache@v3
+      with:
+        path: /var/cache/apt
+        key: ${{ runner.os }}-apt-cache-${{ hashFiles('**/Dockerfile') }}
+        restore-keys: |
+          ${{ runner.os }}-apt-cache-
     - name: Build HTML docmentation
       run: |
         ./scripts/travis-install-build-deps.sh
@@ -106,6 +127,13 @@ jobs:
       env:
         GITHUB_CONTEXT: ${{ toJson(github) }}
       run: echo "$GITHUB_CONTEXT"
+    - name: Cache APT packages
+      uses: actions/cache@v3
+      with:
+        path: /var/cache/apt
+        key: ${{ runner.os }}-apt-cache-${{ hashFiles('**/Dockerfile') }}
+        restore-keys: |
+          ${{ runner.os }}-apt-cache-
     - name: Install pre-dependencies
       env:
         DEBIAN_FRONTEND: noninteractive
@@ -187,7 +215,13 @@ jobs:
       env:
         GITHUB_CONTEXT: ${{ toJson(github) }}
       run: echo "$GITHUB_CONTEXT"
-
+    - name: Cache APT packages
+      uses: actions/cache@v3
+      with:
+        path: /var/cache/apt
+        key: ${{ runner.os }}-apt-cache-${{ hashFiles('**/Dockerfile') }}
+        restore-keys: |
+          ${{ runner.os }}-apt-cache-
     - name: Install pre-dependencies
       env:
         DEBIAN_FRONTEND: noninteractive
@@ -255,6 +289,13 @@ jobs:
       with:
         submodules: true
         fetch-depth: 0
+    - name: Cache APT packages
+      uses: actions/cache@v3
+      with:
+        path: /var/cache/apt
+        key: ${{ runner.os }}-apt-cache-${{ hashFiles('**/Dockerfile') }}
+        restore-keys: |
+          ${{ runner.os }}-apt-cache-
     - name: Perform Source Code checks that were successful in the past
       continue-on-error: true
       run: |
