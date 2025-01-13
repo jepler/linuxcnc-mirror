@@ -341,6 +341,14 @@ static void handle_kinematicsSwitch(void) {
     }
 #endif
     tpSetPos(&emcmotInternal->coord_tp, &emcmotStatus->carte_pos_cmd);
+    
+    /* Also synch teleop mode to avoid change in joint cmd */
+    for (int axis_num = 0; axis_num < MAX_AXIS_AMOUNT; axis_num++) {
+		emcmot_axis_t *axis;
+		axis = &axes[axis_num];
+		axis->teleop_tp.curr_pos = *pcmd_p[axis_num];
+	}
+      
 } //handle_kinematicsSwitch()
 
 static void process_inputs(void)
