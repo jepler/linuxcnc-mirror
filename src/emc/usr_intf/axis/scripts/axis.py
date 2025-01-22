@@ -1895,6 +1895,7 @@ def run_warn():
     return 0
 
 def reload_file(refilter=True):
+    global loaded_file
     if running(): return
     s.poll()
     if not loaded_file:
@@ -1902,7 +1903,7 @@ def reload_file(refilter=True):
         return
     line = vars.highlight_line.get()
     o.set_highlight_line(None)
-
+    orig_loaded_file = loaded_file
     if refilter or not get_filter(loaded_file):
         # we copy the file to a temporary file so that even if it subsequently
         # changes on disk, LinuxCNC is parsing the file contents from the time
@@ -1913,6 +1914,7 @@ def reload_file(refilter=True):
     else:
         tempfile = os.path.join(tempdir, "filtered-" + os.path.basename(loaded_file))
         open_file_guts(tempfile, True, False)
+    loaded_file = orig_loaded_file
     if line:
         o.set_highlight_line(line)
 
