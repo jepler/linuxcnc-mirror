@@ -1,32 +1,40 @@
-loadrt or2 names=or2_0
+# this hal file simulates home swithes
+# the comp function is used to achieve hysteres similar to physical switches 
+# see https://linuxcnc.org/docs/stable/html/man/man9/comp.9.html 
+#
+# the or2 function is only needed for shares home swith signals
+# loadrt or2 names=or2_0
+#
 loadrt comp names=comp_x,comp_y,comp_z
 
-net Xhomeswpos => comp_x.in0
-net Yhomeswpos => comp_y.in0
-net Zhomeswpos => comp_z.in0
+# set fixed value for position of virtual switches
+setp comp_x.in1 1.0 # use input 1 if switches are on the negative end of the axis, change if necessary
+setp comp_y.in1 0.0 
+setp comp_z.in0 190.0 # use input 0 if swithes are on the positive end of the axis
 
-sets Xhomeswpos 1
-sets Yhomeswpos .5
-sets Zhomeswpos 2
-
-net Xpos => comp_x.in1
-net Ypos => comp_y.in1
+# link current position if simulated machine to the other input of virtual switch (the other input of the comp functions is used)
+net Xpos => comp_x.in0 
+net Ypos => comp_y.in0
 net Zpos => comp_z.in1
 
-setp comp_x.hyst .02
-setp comp_y.hyst .02
-setp comp_z.hyst .02
+# set hysteresis of virtual home switches
+setp comp_x.hyst 0.5
+setp comp_y.hyst 0.5
+setp comp_z.hyst 0.5
 
-net Xhomesw <= comp_x.out
+net Xhomesw <= comp_x.out => joint.0.home-sw-in
 net Yhomesw <= comp_y.out => joint.1.home-sw-in
-net Zhomesw <= comp_z.out
+net Zhomesw <= comp_z.out => joint.2.home-sw-in
 
-net Xhomesw => or2_0.in0
-net Zhomesw => or2_0.in1
-net XZhomesw or2_0.out => joint.0.home-sw-in joint.2.home-sw-in
+# this section is only for shared home switch signals on multiple axis
+# net Xhomesw => or2_0.in0
+# net Zhomesw => or2_0.in1
+# net XZhomesw or2_0.out => joint.0.home-sw-in joint.2.home-sw-in
 
+# add the comp functions to the servo thread 
 addf comp_x servo-thread
 addf comp_y servo-thread
 addf comp_z servo-thread
 
-addf or2_0 servo-thread
+# add the or2 function to servo thread
+# addf or2_0 servo-thread
