@@ -296,6 +296,8 @@ int pmRotMatConvert(PmRotationVector const * const r, PmRotationMatrix * const m
 
 int pmRotZyzConvert(PmRotationVector const * const r, PmEulerZyz * const zyz)
 {
+    (void)r;
+    (void)zyz;
 #ifdef PM_DEBUG
 #ifdef PM_PRINT_ERROR
     pmPrintError("error: pmRotZyzConvert not implemented\n");
@@ -573,6 +575,8 @@ int pmMatRpyConvert(PmRotationMatrix const * const m, PmRpy * const rpy)
 
 int pmZyzRotConvert(PmEulerZyz const * const zyz, PmRotationVector * const r)
 {
+    (void)zyz;
+    (void)r;
 #ifdef PM_PRINT_ERROR
     pmPrintError("error: pmZyzRotConvert not implemented\n");
 #endif
@@ -621,6 +625,8 @@ int pmZyzMatConvert(PmEulerZyz  const * const zyz, PmRotationMatrix * const m)
 
 int pmZyzRpyConvert(PmEulerZyz  const * const zyz, PmRpy * const rpy)
 {
+    (void)zyz;
+    (void)rpy;
 #ifdef PM_PRINT_ERROR
     pmPrintError("error: pmZyzRpyConvert not implemented\n");
 #endif
@@ -681,6 +687,8 @@ int pmZyxMatConvert(PmEulerZyx  const * const zyx, PmRotationMatrix * const m)
 
 int pmZyxZyzConvert(PmEulerZyx  const * const zyx, PmEulerZyz * const zyz)
 {
+    (void)zyx;
+    (void)zyz;
 #ifdef PM_PRINT_ERROR
     pmPrintError("error: pmZyxZyzConvert not implemented\n");
 #endif
@@ -689,6 +697,8 @@ int pmZyxZyzConvert(PmEulerZyx  const * const zyx, PmEulerZyz * const zyz)
 
 int pmZyxRpyConvert(PmEulerZyx  const * const zyx, PmRpy * const rpy)
 {
+    (void)zyx;
+    (void)rpy;
 #ifdef PM_PRINT_ERROR
     pmPrintError("error: pmZyxRpyConvert not implemented\n");
 #endif
@@ -751,6 +761,8 @@ int pmRpyMatConvert(PmRpy  const * const rpy, PmRotationMatrix * const m)
 
 int pmRpyZyzConvert(PmRpy  const * const rpy, PmEulerZyz * const zyz)
 {
+    (void)rpy;
+    (void)zyz;
 #ifdef PM_PRINT_ERROR
     pmPrintError("error: pmRpyZyzConvert not implemented\n");
 #endif
@@ -759,6 +771,8 @@ int pmRpyZyzConvert(PmRpy  const * const rpy, PmEulerZyz * const zyz)
 
 int pmRpyZyxConvert(PmRpy  const * const rpy, PmEulerZyx * const zyx)
 {
+    (void)rpy;
+    (void)zyx;
 #ifdef PM_PRINT_ERROR
     pmPrintError("error: pmRpyZyxConvert not implemented\n");
 #endif

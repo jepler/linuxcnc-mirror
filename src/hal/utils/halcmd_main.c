@@ -397,6 +397,7 @@ static char **completion_callback(const char *text, hal_generator_func cb) {
 
 /* completion text starts with "halcmd", so remove that from the string */
 static int propose_completion(char *all, char *fragment, int start) {
+    (void)start;
     int sp=0, len=strlen(all), i=0;
     for(; i<len; i++) if(all[i] == ' ') sp = i;
     if(sp) sp++;

@@ -1666,7 +1666,7 @@ static int sockMain()
   return 0;
 }
 
-static void sigQuit(int sig)
+static void sigQuit(int /*sig*/)
 {
 
   quitting = 1;

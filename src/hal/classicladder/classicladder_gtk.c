@@ -127,6 +127,8 @@ void CairoDrawCurrentSectionOnDrawingArea( cairo_t *cr )
 #if GTK_MAJOR_VERSION>=3
 void draw_callback( GtkWidget *widget, cairo_t *cr, gpointer data)
 {
+	(void)widget;
+	(void)data;
 	CairoDrawCurrentSectionOnDrawingArea( cr );
 }
 #else
@@ -292,6 +294,7 @@ void ChoiceOfTheCurrentRung( int NbrOfRungsAfterTopRung )
 
 static gint VScrollBar_value_changed_event( GtkAdjustment * ScrollBar, void * not_used )
 {
+	(void)not_used;
 	int iCurrentLanguage = SectionArray[ InfosGene->CurrentSection ].Language;
 	if ( iCurrentLanguage==SECTION_IN_LADDER )
 	{
@@ -316,6 +319,7 @@ static gint VScrollBar_value_changed_event( GtkAdjustment * ScrollBar, void * no
 }
 static gint HScrollBar_value_changed_event( GtkAdjustment * ScrollBar, void * not_used )
 {
+	(void)not_used;
 	InfosGene->HScrollValue = (int)gtk_adjustment_get_value( ScrollBar );
 	return TRUE;
 }
@@ -346,6 +350,7 @@ static void IncrementVScrollBar( int IncrementValue )
 
 static gboolean mouse_scroll_event( GtkWidget *widget, GdkEventScroll *event )
 {
+	(void)widget;
 	int iCurrentLanguage = SectionArray[ InfosGene->CurrentSection ].Language;
 	if ( iCurrentLanguage==SECTION_IN_LADDER )
 	{
@@ -358,6 +363,7 @@ static gboolean mouse_scroll_event( GtkWidget *widget, GdkEventScroll *event )
 }
 static gboolean button_press_event( GtkWidget *widget, GdkEventButton *event )
 {
+	(void)widget;
 	if (event->button == 1 /*Cairo && pixmap != NULL*/)
 	{
 		if (EditDatas.ModeEdit)
@@ -391,6 +397,8 @@ static gboolean button_press_event( GtkWidget *widget, GdkEventButton *event )
 }
 static gboolean motion_notify_event( GtkWidget *widget, GdkEventMotion *event, gpointer user_data )
 {
+	(void)widget;
+	(void)user_data;
 	//v0.9.20
 	if( SectionArray==NULL )
 		return TRUE;
@@ -412,6 +420,7 @@ static gboolean motion_notify_event( GtkWidget *widget, GdkEventMotion *event, g
 }
 static gboolean button_release_event( GtkWidget *widget, GdkEventButton *event )
 {
+	(void)widget;
 	if (event->button == 1 /*Cairo && pixmap != NULL*/)
 	{
 		if (EditDatas.ModeEdit)
@@ -471,6 +480,7 @@ void CheckDispSymbols_toggled( )
 void StoreDirectorySelected( GtkFileChooser *selector, char cForLoadingProject)
 {
 	char * TempDir;
+	(void)selector;
 
 	TempDir = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(FileSelector));
 
@@ -522,6 +532,7 @@ void SaveAsLadder(void)
 
 void on_filechooserdialog_save_response(GtkDialog  *dialog,gint response_id,gpointer user_data)
 {
+	(void)user_data;
 	debug_printf(_("SAVE %s %d\n"),gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(FileSelector)),response_id);
 
 	if(response_id==GTK_RESPONSE_ACCEPT || response_id==GTK_RESPONSE_OK)
@@ -530,6 +541,7 @@ void on_filechooserdialog_save_response(GtkDialog  *dialog,gint response_id,gpoi
 }
 void on_filechooserdialog_load_response(GtkDialog  *dialog,gint response_id,gpointer user_data)
 {
+	(void)user_data;
 	debug_printf(_("LOAD %s %d\n"),gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(FileSelector)),response_id);
 
 	if(response_id==GTK_RESPONSE_ACCEPT || response_id==GTK_RESPONSE_OK)
@@ -841,6 +853,7 @@ void ShowMessageBoxError( const char * text )
 
 void DoFunctionOfConfirmationBox( GtkWidget *widget, void * (*function_to_do)(void *) )
 {
+	(void)widget;
 	gtk_widget_destroy(ConfirmDialog);
 	(function_to_do)(NULL);
 }
@@ -915,6 +928,9 @@ void ConfirmQuit( void )
 }
 gint MainSectionWindowDeleteEvent( GtkWidget * widget, GdkEvent * event, gpointer data )
 {
+	(void)widget;
+	(void)event;
+	(void)data;
 	ConfirmQuit( );
 	// we do not want that the window be destroyed.
 	return TRUE;
@@ -1206,6 +1222,7 @@ void RedrawSignalDrawingArea( void )
 
 static gint PeriodicUpdateDisplay(gpointer data)
 {
+	(void)data;
 	if (InfosGene->LadderState==STATE_RUN)
 	{
 #if defined( RT_SUPPORT ) || defined( __XENO__ )
@@ -1323,6 +1340,9 @@ void UpdateWindowTitleWithProjectName( void )
 
 gint ErrorMessageDeleteEvent( GtkWidget * widget, GdkEvent * event, gpointer data )
 {
+	(void)widget;
+	(void)event;
+	(void)data;
 	gtk_widget_hide( dialog );
 	// we do not want that the window be destroyed.
 	return TRUE;

@@ -678,7 +678,7 @@ int usrmotLoadComp(int joint, const char *file, int type)
 }
 
 
-int usrmotPrintComp(int joint)
+int usrmotPrintComp(int /*joint*/)
 {
 /* FIXME-AJ: comp isn't in shmem atm
   it's in the joint struct, which is only in shmem when STRUCTS_IN_SHM is defined,

@@ -347,7 +347,7 @@ of the arc lies on a line through M perpendicular to L.
 */
 
 int Interp::arc_data_r(int move, //!< either G_2 (cw arc) or G_3 (ccw arc)
-                      CANON_PLANE plane,
+                      CANON_PLANE /*plane*/,
                       double current_x, //!< first coordinate of current point
                       double current_y, //!< second coordinate of current point
                       double end_x,     //!< first coordinate of arc end point

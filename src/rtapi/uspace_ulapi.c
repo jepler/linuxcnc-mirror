@@ -31,21 +31,33 @@
 int rtapi_fifo_new(int key, int module_id, unsigned long int size, char mode)
 
 {
+  (void)key;
+  (void)module_id;
+  (void)size;
+  (void)mode;
   return -ENOSYS;
 }
 
 int rtapi_fifo_delete(int fifo_id, int module_id)
 {
+  (void)fifo_id;
+  (void)module_id;
   return -ENOSYS;
 }
 
 int rtapi_fifo_read(int fifo_id, char *buf, unsigned long size)
 {
+  (void)fifo_id;
+  (void)buf;
+  (void)size;
   return -ENOSYS;
 }
 
 int rtapi_fifo_write(int fifo_id, char *buf, unsigned long int size)
 {
+  (void)fifo_id;
+  (void)buf;
+  (void)size;
   return -ENOSYS;
 }
 

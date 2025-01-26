@@ -102,7 +102,7 @@ struct pyErrorChannel {
 
 static PyObject *m = NULL, *error = NULL;
 
-static int Ini_init(pyIniFile *self, PyObject *a, PyObject *k) {
+static int Ini_init(pyIniFile *self, PyObject *a, PyObject * /*k*/) {
     char *inifile;
     if(!PyArg_ParseTuple(a, "s", &inifile)) return -1;
 
@@ -265,7 +265,7 @@ static const char *get_nmlfile(void) {
     return PyUnicode_AsUTF8(fileobj);
 }
 
-static int Stat_init(pyStatChannel *self, PyObject *a, PyObject *k) {
+static int Stat_init(pyStatChannel *self, PyObject * /*a*/, PyObject * /*k*/) {
     const char *file = get_nmlfile();
     if(file == NULL) return -1;
 
@@ -295,7 +295,7 @@ static bool check_stat(RCS_STAT_CHANNEL *emcStatusBuffer) {
 
 static bool initialized=0;
 
-static PyObject *poll(pyStatChannel *s, PyObject *o) {
+static PyObject *poll(pyStatChannel *s, PyObject * /*o*/) {
 #ifdef TOOL_NML //{
     if (!initialized) {
       //fprintf(stderr,"%8d tool_nml_register\n",getpid());
@@ -343,7 +343,7 @@ static void dict_add(PyObject *d, const char *name, int v) {
     Py_XDECREF(o);
 }
 
-static PyObject *toolinfo(pyStatChannel *s, PyObject *o) {
+static PyObject *toolinfo(pyStatChannel * /*s*/, PyObject *o) {
     /*Note: this method uses the tooldata interface and is included
     **      as a Stat method for convenience.
     **      pyStatChannel is not used but an initial stat poll()
@@ -895,7 +895,7 @@ static PyTypeObject Stat_Type = {
 #endif
 };
 
-static int Command_init(pyCommandChannel *self, PyObject *a, PyObject *k) {
+static int Command_init(pyCommandChannel *self, PyObject * /*a*/, PyObject * /*k*/) {
     const char *file = get_nmlfile();
     if(file == NULL) return -1;
 
@@ -1176,7 +1176,7 @@ static PyObject *brake(pyCommandChannel *s, PyObject *o) {
     return Py_None;
 }
 
-static PyObject *load_tool_table(pyCommandChannel *s, PyObject *o) {
+static PyObject *load_tool_table(pyCommandChannel *s, PyObject * /*o*/) {
     EMC_TOOL_LOAD_TOOL_TABLE m;
     m.file[0] = '\0'; // don't override the INI file
     emcSendCommand(s, m);
@@ -1184,14 +1184,14 @@ static PyObject *load_tool_table(pyCommandChannel *s, PyObject *o) {
     return Py_None;
 }
 
-static PyObject *emcabort(pyCommandChannel *s, PyObject *o) {
+static PyObject *emcabort(pyCommandChannel *s, PyObject * /*o*/) {
     EMC_TASK_ABORT m;
     emcSendCommand(s, m);
     Py_INCREF(Py_None);
     return Py_None;
 }
 
-static PyObject *override_limits(pyCommandChannel *s, PyObject *o) {
+static PyObject *override_limits(pyCommandChannel *s, PyObject * /*o*/) {
     EMC_JOINT_OVERRIDE_LIMITS m;
     m.joint = 0; // same number for all
     emcSendCommand(s, m);
@@ -1273,7 +1273,7 @@ static PyObject *jog(pyCommandChannel *s, PyObject *o) {
     return Py_None;
 }
 
-static PyObject *reset_interpreter(pyCommandChannel *s, PyObject *o) {
+static PyObject *reset_interpreter(pyCommandChannel *s, PyObject * /*o*/) {
     EMC_TASK_PLAN_INIT m;
     emcSendCommand(s, m);
     Py_INCREF(Py_None);
@@ -1689,7 +1689,7 @@ static PyTypeObject Command_Type = {
 #endif
 };
 
-static int Error_init(pyErrorChannel *self, PyObject *a, PyObject *k) {
+static int Error_init(pyErrorChannel *self, PyObject * /*a*/, PyObject * /*k*/) {
     const char *file = get_nmlfile();
     if(file == NULL) return -1;
 
@@ -1957,7 +1957,7 @@ static void line9b(const double p1[9], const double p2[9], const char *geometry)
     }
 }
 
-static PyObject *pyline9(PyObject *s, PyObject *o) {
+static PyObject *pyline9(PyObject * /*s*/, PyObject *o) {
     double pt1[9], pt2[9];
     const char *geometry;
 
@@ -1976,7 +1976,7 @@ static PyObject *pyline9(PyObject *s, PyObject *o) {
     Py_RETURN_NONE;
 }
 
-static PyObject *pyvertex9(PyObject *s, PyObject *o) {
+static PyObject *pyvertex9(PyObject * /*s*/, PyObject *o) {
     double pt1[9], pt[3];
     char *geometry;
     if(!PyArg_ParseTuple(o, "s(ddddddddd):vertex9",
@@ -1990,7 +1990,7 @@ static PyObject *pyvertex9(PyObject *s, PyObject *o) {
     return Py_BuildValue("(ddd)", &pt[0], &pt[1], &pt[2]);
 }
 
-static PyObject *pygui_respect_offsets (PyObject *s, PyObject *o) {
+static PyObject *pygui_respect_offsets (PyObject * /*s*/, PyObject *o) {
     char* coords;
 
     if(!PyArg_ParseTuple(o, "si",&coords, &roffsets.respect_offsets)) {
@@ -2007,7 +2007,7 @@ static PyObject *pygui_respect_offsets (PyObject *s, PyObject *o) {
     return Py_None;
 }
 
-static PyObject *pygui_rot_offsets(PyObject *s, PyObject *o) {
+static PyObject *pygui_rot_offsets(PyObject * /*s*/, PyObject *o) {
     if(!PyArg_ParseTuple(o, "ddd", &roffsets.x,&roffsets.y,&roffsets.z)) {
         return NULL;
     }
@@ -2015,7 +2015,7 @@ static PyObject *pygui_rot_offsets(PyObject *s, PyObject *o) {
     return Py_None;
 }
 
-static PyObject *pydraw_lines(PyObject *s, PyObject *o) {
+static PyObject *pydraw_lines(PyObject * /*s*/, PyObject *o) {
     PyListObject *li;
     int for_selection = 0;
     int i;
@@ -2063,7 +2063,7 @@ static PyObject *pydraw_lines(PyObject *s, PyObject *o) {
     return Py_None;
 }
 
-static PyObject *pydraw_dwells(PyObject *s, PyObject *o) {
+static PyObject *pydraw_dwells(PyObject * /*s*/, PyObject *o) {
     PyListObject *li;
     int for_selection = 0, is_lathe = 0, i, n;
     double alpha;
@@ -2185,7 +2185,7 @@ static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 static void LOCK() { pthread_mutex_lock(&mutex); }
 static void UNLOCK() { pthread_mutex_unlock(&mutex); }
 
-static int Logger_init(pyPositionLogger *self, PyObject *a, PyObject *k) {
+static int Logger_init(pyPositionLogger *self, PyObject *a, PyObject * /*k*/) {
     char *geometry;
     struct color *c = self->colors;
     self->p = (logger_point*)malloc(sizeof(self->p[0])); // Will be realloc'ed
@@ -2390,19 +2390,19 @@ static PyObject *Logger_start(pyPositionLogger *s, PyObject *o) {
     return Py_None;
 }
 
-static PyObject* Logger_clear(pyPositionLogger *s, PyObject *o) {
+static PyObject* Logger_clear(pyPositionLogger *s, PyObject * /*o*/) {
     s->clear = true;
     Py_INCREF(Py_None);
     return Py_None;
 }
 
-static PyObject* Logger_stop(pyPositionLogger *s, PyObject *o) {
+static PyObject* Logger_stop(pyPositionLogger *s, PyObject * /*o*/) {
     s->exit = true;
     Py_INCREF(Py_None);
     return Py_None;
 }
 
-static PyObject* Logger_call(pyPositionLogger *s, PyObject *o) {
+static PyObject* Logger_call(pyPositionLogger *s, PyObject * /*o*/) {
     if(!s->clear) {
         LOCK();
         if(s->is_xyuv) {

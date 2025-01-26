@@ -67,10 +67,13 @@ pin out float resistance "Computed resistance of the thermistor.";
 int should_exit = 0;
 
 void sigterm_handler(int signo) {
+    (void)signo;
     should_exit = 1;
 }
 
 static void userinit(int argc, char **argv) {
+    (void)argc;
+    (void)argv;
     signal(SIGTERM, sigterm_handler);
 }
 

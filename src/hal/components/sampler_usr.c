@@ -96,6 +96,7 @@ char comp_name[HAL_NAME_LEN+1];	/* name for this instance of sampler */
 static sig_atomic_t stop;
 static void quit(int sig)
 {
+    (void)sig;
     if ( ignore_sig ) {
 	return;
     }

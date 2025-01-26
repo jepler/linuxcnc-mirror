@@ -429,6 +429,7 @@ const char *halCommands[] = {
 /* signal handler */
 static void quit(int sig)
 {
+    (void)sig;
     if ( hal_flag ) {
 	/* this process might have the hal mutex, so just set the
 	   'done' flag and return, exit after mutex work finishes */
@@ -909,6 +910,7 @@ static int doNewsig(char *name, char *type, connectionRecType *context)
 }
 
 static int set_common(hal_type_t type, void *d_ptr, char *value, connectionRecType *context) {
+    (void)context;
     // This function assumes that the mutex is held
     int retval = 0;
     double fval;
@@ -2488,6 +2490,7 @@ static halCommandType lookupHalCommand(char *s)
 
 static cmdResponseType getEcho(char *s, connectionRecType *context)
 {
+  (void)s;
   const char *pEchoStr = "ECHO %s";
   
   if (context->echo == 1) snprintf(context->outBuf, sizeof(context->outBuf), pEchoStr, "ON");
@@ -2497,6 +2500,7 @@ static cmdResponseType getEcho(char *s, connectionRecType *context)
 
 static cmdResponseType getVerbose(char *s, connectionRecType *context)
 {
+  (void)s;
   const char *pVerboseStr = "VERBOSE %s";
   
   if (context->verbose == 1) snprintf(context->outBuf, sizeof(context->outBuf), pVerboseStr, "ON");
@@ -2506,6 +2510,7 @@ static cmdResponseType getVerbose(char *s, connectionRecType *context)
 
 static cmdResponseType getEnable(char *s, connectionRecType *context)
 {
+  (void)s;
   const char *pEnableStr = "ENABLE %s";
   
   if (context->cliSock == enabledConn) snprintf(context->outBuf, sizeof(context->outBuf), pEnableStr, "ON");
@@ -2515,6 +2520,7 @@ static cmdResponseType getEnable(char *s, connectionRecType *context)
 
 static cmdResponseType getConfig(char *s, connectionRecType *context)
 {
+  (void)s;
   const char *pConfigStr = "CONFIG";
 
   rtapi_strxcpy(context->outBuf, pConfigStr);
@@ -2523,6 +2529,7 @@ static cmdResponseType getConfig(char *s, connectionRecType *context)
 
 static cmdResponseType getCommMode(char *s, connectionRecType *context)
 {
+  (void)s;
   const char *pCommModeStr = "COMM_MODE %s";
   
   switch (context->commMode) {
@@ -2534,6 +2541,7 @@ static cmdResponseType getCommMode(char *s, connectionRecType *context)
 
 static cmdResponseType getCommProt(char *s, connectionRecType *context)
 {
+  (void)s;
   const char *pCommProtStr = "COMM_PROT %s";
   
   snprintf(context->outBuf, sizeof(context->outBuf), pCommProtStr, context->version);
@@ -2827,6 +2835,8 @@ static cmdResponseType setEnable(char *s, connectionRecType *context)
 
 static cmdResponseType setConfig(char *s, connectionRecType *context)
 {
+  (void)s;
+  (void)context;
   return rtNoError;
 }
 
@@ -2842,6 +2852,7 @@ static cmdResponseType setCommMode(char *s, connectionRecType *context)
 
 static cmdResponseType setCommProt(char *s, connectionRecType *context)
 {
+  (void)s;
   char *pVersion;
   
   pVersion = strtok(NULL, delims);
@@ -2881,6 +2892,7 @@ static cmdResponseType setUnload(char *s, connectionRecType *context)
 
 static cmdResponseType setLoadUsr(char *s, connectionRecType *context)
 {
+  (void)context;
   char *argv[MAX_TOK+1] = {0};
 
   argv[0] = s;
@@ -3372,6 +3384,7 @@ int parseCommand(connectionRecType *context)
 
 void *readClient(void *arg)
 {
+  (void)arg;
   char str[1600];
   char buf[1600];
   unsigned int i, j;

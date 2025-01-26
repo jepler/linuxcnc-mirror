@@ -168,6 +168,9 @@ static gint OffsetBoolVar_activate_event(GtkWidget *widget, void * NumVarSpy)
 
 gint BoolVarsWindowDeleteEvent( GtkWidget * widget, GdkEvent * event, gpointer data )
 {
+	(void)widget;
+	(void)event;
+	(void)data;
 	gtk_widget_hide( SpyBoolVarsWindow );
 	SetToggleMenuForBoolVarsWindow( FALSE/*OpenedWin*/ );
 	// we do not want that the window be destroyed.
@@ -252,6 +255,7 @@ gtk_entry_set_width_chars( GTK_ENTRY(offsetboolvar[ ColumnVar ]), 4 );
 
 static gint OpenModifyVarWindow_clicked_event(GtkWidget *widget, int NumSpy)
 {
+	(void)widget;
 	char BuffValue[ 30 ];
 	CurrentModifyVarType = VarSpy[NumSpy][0];
 	CurrentModifyVarOffset = VarSpy[NumSpy][1];
@@ -269,6 +273,9 @@ static gint OpenModifyVarWindow_clicked_event(GtkWidget *widget, int NumSpy)
 }
 gint ModifyVarWindowDeleteEvent( GtkWidget * widget, GdkEvent * event, gpointer data )
 {
+	(void)widget;
+	(void)event;
+	(void)data;
 	gtk_window_get_position( GTK_WINDOW(ModifyVarValueWindow), &SaveModifyVarPosX, &SaveModifyVarPosY );
 	gtk_widget_hide( ModifyVarValueWindow );
 	// we do not want that the window be destroyed.
@@ -276,6 +283,9 @@ gint ModifyVarWindowDeleteEvent( GtkWidget * widget, GdkEvent * event, gpointer 
 }
 gint ApplyModifiedVar( GtkWidget * widget, GdkEvent * event, gpointer data )
 {
+	(void)widget;
+	(void)event;
+	(void)data;
 	int NewValue = atoi( gtk_entry_get_text( GTK_ENTRY(ModifyVariableValueEdit) ) );
 	WriteVar( CurrentModifyVarType, CurrentModifyVarOffset, NewValue );
 	gtk_window_get_position( GTK_WINDOW(ModifyVarValueWindow), &SaveModifyVarPosX, &SaveModifyVarPosY );
@@ -489,6 +499,9 @@ static gint EntryVarSpy_activate_event(GtkWidget *widget, int NumSpy)
 
 gint FreeVarsWindowDeleteEvent( GtkWidget * widget, GdkEvent * event, gpointer data )
 {
+	(void)widget;
+	(void)event;
+	(void)data;
 	gtk_widget_hide( SpyFreeVarsWindow );
 	SetToggleMenuForFreeVarsWindow( FALSE/*OpenedWin*/ );
 	// we do not want that the window be destroyed.

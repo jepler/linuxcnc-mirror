@@ -185,6 +185,7 @@ static int check_crc16(hycomm_param_t *hc_param, uint8_t *msg,
 static unsigned int compute_response_length(hycomm_param_t *hc_param, 
 					  uint8_t *query)
 {
+	(void)hc_param;
 	int resp_length;
 
 	switch (query[1])

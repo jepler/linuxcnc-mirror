@@ -66,6 +66,7 @@ void emit(int fd, int type, int code, int val)
 }
 
 static void exit_handler(int sig) {
+    (void)sig;
     printf("sendkeys: exiting\n");
     exit(0);
 }

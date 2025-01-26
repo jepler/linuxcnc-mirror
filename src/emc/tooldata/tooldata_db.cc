@@ -64,7 +64,7 @@ static int pipes[NUM_PIPES][2];
 static bool is_random_toolchanger = 0;
 static char db_childname[PATH_MAX];
 
-static void handle_sigchild(int s)
+static void handle_sigchild(int /*s*/)
 {
     pid_t pid;
     int status;
@@ -89,7 +89,7 @@ static void handle_sigchild(int s)
 #endif
 }
 
-static int fork_create(int myargc,char *const myargv[])
+static int fork_create(int /*myargc*/, char *const myargv[])
 {
     // O_DIRECT:packet mode
     if (pipe2(pipes[PARENT_READ_PIPE],O_DIRECT)) {

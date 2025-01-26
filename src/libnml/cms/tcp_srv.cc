@@ -732,7 +732,7 @@ void CMS_SERVER_REMOTE_TCP_PORT::handle_request(CLIENT_TCP_PORT *
 void CMS_SERVER_REMOTE_TCP_PORT::switch_function(CLIENT_TCP_PORT *
     _client_tcp_port,
     CMS_SERVER * server,
-    long request_type, long buffer_number, long received_serial_number)
+    long request_type, long buffer_number, long /*received_serial_number*/)
 {
     int total_subdivisions = 1;
     CLIENT_TCP_PORT *client_port_to_check = NULL;

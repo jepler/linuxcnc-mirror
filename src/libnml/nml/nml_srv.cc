@@ -337,7 +337,7 @@ set_diag_info(REMOTE_SET_DIAG_INFO_REQUEST * _req)
 }
 
 REMOTE_GET_DIAG_INFO_REPLY *NML_SERVER_LOCAL_PORT::
-get_diag_info(REMOTE_GET_DIAG_INFO_REQUEST * _req)
+get_diag_info(REMOTE_GET_DIAG_INFO_REQUEST * /*_req*/)
 {
     get_diag_info_reply.cdi = cms->get_diagnostics_info();
     get_diag_info_reply.status = cms->status;
@@ -345,7 +345,7 @@ get_diag_info(REMOTE_GET_DIAG_INFO_REQUEST * _req)
 }
 
 REMOTE_GET_MSG_COUNT_REPLY *NML_SERVER_LOCAL_PORT::
-get_msg_count(REMOTE_GET_DIAG_INFO_REQUEST * _req)
+get_msg_count(REMOTE_GET_DIAG_INFO_REQUEST * /*_req*/)
 {
     return (NULL);
 }

@@ -421,6 +421,7 @@ int set_trigger_level(double setting)
 
 static void level_changed(GtkAdjustment * adj, gpointer gdata)
 {
+    (void)gdata;
     set_trigger_level(gtk_adjustment_get_value(adj) / TRIG_LEVEL_RESOLUTION);
 }
 
@@ -451,6 +452,7 @@ int set_trigger_pos(double setting)
 
 static void pos_changed(GtkAdjustment * adj, gpointer gdata)
 {
+    (void)gdata;
     set_trigger_pos(gtk_adjustment_get_value(adj) / TRIG_POS_RESOLUTION);
 }
 
@@ -469,6 +471,8 @@ int set_trigger_polarity(int setting)
 
 static void edge_button_clicked(GtkWidget * widget, gpointer * gdata)
 {
+    (void)widget;
+    (void)gdata;
     if (ctrl_shm->trig_edge == 0) {
 	/* was falling edge, make rising */
 	set_trigger_polarity(1);
@@ -498,6 +502,7 @@ int set_trigger_mode(int mode)
 
 static void normal_button_clicked(GtkWidget * widget, gpointer * gdata)
 {
+    (void)gdata;
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) != TRUE) {
 	/* not pressed, ignore it */
 	return;
@@ -507,6 +512,7 @@ static void normal_button_clicked(GtkWidget * widget, gpointer * gdata)
 
 static void auto_button_clicked(GtkWidget * widget, gpointer * gdata)
 {
+    (void)gdata;
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) != TRUE) {
 	/* not pressed, ignore it */
 	return;
@@ -516,10 +522,14 @@ static void auto_button_clicked(GtkWidget * widget, gpointer * gdata)
 
 static void force_button_clicked(GtkWidget * widget, gpointer * gdata)
 {
+    (void)widget;
+    (void)gdata;
     ctrl_shm->force_trig = 1;
 }
 
 static void source_button_clicked(GtkWidget * widget, gpointer * gdata)
 {
+    (void)widget;
+    (void)gdata;
     dialog_select_trigger_source();
 }

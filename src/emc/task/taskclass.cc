@@ -108,7 +108,7 @@ int emcToolSetOffset(int pocket, int toolno, EmcPose offset, double diameter,
 					   frontangle,  backangle,  orientation); }
 int emcToolSetNumber(int number) { return task_methods->emcToolSetNumber(number); }
 
-int emcTaskOnce(const char *filename, EMC_IO_STAT &emcioStatus)
+int emcTaskOnce(const char * /*filename*/, EMC_IO_STAT &emcioStatus)
 {
 	task_methods = new Task(emcioStatus);
     if (int res = task_methods->iocontrol_hal_init()) {
@@ -356,7 +356,7 @@ int Task::emcIoInit()//EMC_TOOL_INIT
     return 0;
 }
 
-int Task::emcIoAbort(EMC_ABORT reason)//EMC_TOOL_ABORT_TYPE
+int Task::emcIoAbort(EMC_ABORT /*reason*/)//EMC_TOOL_ABORT_TYPE
 {
     // only used in v2
     // this gets sent on any Task Abort, so it might be safer to stop

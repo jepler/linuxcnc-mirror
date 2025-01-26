@@ -2398,7 +2398,7 @@ NMLTYPE NML::peek_subdivision(int subdiv)
 }
 
 // This constructor declared private to prevent copying.
-NML::NML(NML & nml)
+NML::NML(NML & /*nml*/)
 {
 }
 

@@ -548,7 +548,7 @@ static int initSocket()
   return 0;
 }
 
-static void sigQuit(int sig)
+static void sigQuit(int /*sig*/)
 {
     thisQuit();
 }
@@ -741,7 +741,7 @@ static cmdResponseType setCommProt(connectionRecType *context)
   return rtNoError;
 }
 
-static cmdResponseType setDebug(connectionRecType *context)
+static cmdResponseType setDebug(connectionRecType * /*context*/)
 {
   char *pLevel;
   int level;
@@ -783,7 +783,7 @@ static cmdResponseType setSetWait(connectionRecType *context)
   return setWaitMode(context);
 }
 
-static cmdResponseType setMachine(connectionRecType *context)
+static cmdResponseType setMachine(connectionRecType * /*context*/)
 {
    char *s = strtok(NULL, delims);
    switch (checkOnOff(s)) {
@@ -798,7 +798,7 @@ static cmdResponseType setMachine(connectionRecType *context)
    return rtNoError;
 }
 
-static cmdResponseType setEStop(connectionRecType *context)
+static cmdResponseType setEStop(connectionRecType * /*context*/)
 {
     char *state = strtok(NULL, delims);
     switch (checkOnOff(state)) {
@@ -817,7 +817,7 @@ static cmdResponseType setEStop(connectionRecType *context)
     return rtNoError;
 }
 
-static cmdResponseType setWait(connectionRecType *context)
+static cmdResponseType setWait(connectionRecType * /*context*/)
 {
   char *s = strtok(NULL, delims);
   switch (checkReceivedDoneNone(s)) {
@@ -834,7 +834,7 @@ static cmdResponseType setWait(connectionRecType *context)
   return rtNoError;
 }
 
-static cmdResponseType setTimeout(connectionRecType *context)
+static cmdResponseType setTimeout(connectionRecType * /*context*/)
 {
   float Timeout;
 
@@ -845,7 +845,7 @@ static cmdResponseType setTimeout(connectionRecType *context)
   return rtNoError;
 }
 
-static cmdResponseType setUpdate(connectionRecType *context)
+static cmdResponseType setUpdate(connectionRecType * /*context*/)
 {
   char *s = strtok(NULL, delims);
   switch (checkNoneAuto(s)) {
@@ -856,7 +856,7 @@ static cmdResponseType setUpdate(connectionRecType *context)
   return rtNoError;
 }
 
-static cmdResponseType setMode(connectionRecType *context)
+static cmdResponseType setMode(connectionRecType * /*context*/)
 {
   char *s = strtok(NULL, delims);
   switch (checkManualAutoMDI(s)) {
@@ -874,7 +874,7 @@ static cmdResponseType setMode(connectionRecType *context)
   return rtNoError;
 }
 
-static cmdResponseType setMist(connectionRecType *context)
+static cmdResponseType setMist(connectionRecType * /*context*/)
 {
    char *s = strtok(NULL, delims);
    switch (checkOnOff(s)) {
@@ -889,7 +889,7 @@ static cmdResponseType setMist(connectionRecType *context)
    return rtNoError;
 }
 
-static cmdResponseType setFlood(connectionRecType *context)
+static cmdResponseType setFlood(connectionRecType * /*context*/)
 {
    char *s = strtok(NULL, delims);
    switch (checkOnOff(s)) {
@@ -1030,7 +1030,7 @@ static cmdResponseType setBrake(connectionRecType *context)
     return rtNoError;
 }
 
-static cmdResponseType setLoadToolTable(connectionRecType *context)
+static cmdResponseType setLoadToolTable(connectionRecType * /*context*/)
 {
   char *s = strtok(NULL, delims);
   if (!s) return rtStandardError;
@@ -1038,7 +1038,7 @@ static cmdResponseType setLoadToolTable(connectionRecType *context)
   return rtNoError;
 }
 
-static cmdResponseType setToolOffset(connectionRecType *context)
+static cmdResponseType setToolOffset(connectionRecType * /*context*/)
 {
   int tool;
   float length, diameter;
@@ -1057,7 +1057,7 @@ static cmdResponseType setToolOffset(connectionRecType *context)
   return rtNoError;
 }
 
-static cmdResponseType setOverrideLimits(connectionRecType *context)
+static cmdResponseType setOverrideLimits(connectionRecType * /*context*/)
 {
    char *s = strtok(NULL, delims);
    switch (checkOnOff(s)) {
@@ -1068,14 +1068,14 @@ static cmdResponseType setOverrideLimits(connectionRecType *context)
    return rtNoError;
 }
 
-static cmdResponseType setMDI(connectionRecType *context)
+static cmdResponseType setMDI(connectionRecType * /*context*/)
 {
   char *s = strtok(NULL, "\n\r\0");
   if (sendMdiCmd(s) !=0) return rtStandardError;
   return rtNoError;
 }
 
-static cmdResponseType setHome(connectionRecType *context)
+static cmdResponseType setHome(connectionRecType * /*context*/)
 {
   int joint;
 
@@ -1110,7 +1110,7 @@ static int axisnumber(char *s) {
   return axis;
 }
 
-static cmdResponseType setJogStop(connectionRecType *context)
+static cmdResponseType setJogStop(connectionRecType * /*context*/)
 {
   int ja,jnum,jjogmode;
   char aletter;
@@ -1137,7 +1137,7 @@ static cmdResponseType setJogStop(connectionRecType *context)
   return rtNoError;
 }
 
-static cmdResponseType setJog(connectionRecType *context)
+static cmdResponseType setJog(connectionRecType * /*context*/)
 {
   int ja,jnum,jjogmode;
   char aletter;
@@ -1165,7 +1165,7 @@ static cmdResponseType setJog(connectionRecType *context)
   return rtNoError;
 }
 
-static cmdResponseType setFeedOverride(connectionRecType *context)
+static cmdResponseType setFeedOverride(connectionRecType * /*context*/)
 {
   char *s = strtok(NULL, delims);
   if (!s)
@@ -1181,7 +1181,7 @@ static cmdResponseType setFeedOverride(connectionRecType *context)
   return rtNoError;
 }
 
-static cmdResponseType setJogIncr(connectionRecType *context)
+static cmdResponseType setJogIncr(connectionRecType * /*context*/)
 {
   int jnum,ja,jjogmode;
   char aletter;
@@ -1218,7 +1218,7 @@ static cmdResponseType setJogIncr(connectionRecType *context)
   return rtNoError;
 }
 
-static cmdResponseType setTaskPlanInit(connectionRecType *context)
+static cmdResponseType setTaskPlanInit(connectionRecType * /*context*/)
 {
   if (sendTaskPlanInit() != 0) return rtStandardError;
   return rtNoError;
@@ -1243,7 +1243,7 @@ static cmdResponseType setOpen(connectionRecType *context)
   return rtNoError;
 }
 
-static cmdResponseType setRun(connectionRecType *context)
+static cmdResponseType setRun(connectionRecType * /*context*/)
 {
   char *s = strtok(NULL, delims);
   if (!s) { // run from beginning
@@ -1263,31 +1263,31 @@ static cmdResponseType setRun(connectionRecType *context)
   return rtNoError;
 }
 
-static cmdResponseType setPause(connectionRecType *context)
+static cmdResponseType setPause(connectionRecType * /*context*/)
 {
   if (sendProgramPause() != 0) return rtStandardError;
   return rtNoError;
 }
 
-static cmdResponseType setResume(connectionRecType *context)
+static cmdResponseType setResume(connectionRecType * /*context*/)
 {
   if (sendProgramResume() != 0) return rtStandardError;
   return rtNoError;
 }
 
-static cmdResponseType setStep(connectionRecType *context)
+static cmdResponseType setStep(connectionRecType * /*context*/)
 {
   if (sendProgramStep() != 0) return rtStandardError;
   return rtNoError;
 }
 
-static cmdResponseType setAbort(connectionRecType *context)
+static cmdResponseType setAbort(connectionRecType * /*context*/)
 {
   if (sendAbort() != 0) return rtStandardError;
   return rtNoError;
 }
 
-static cmdResponseType setLinearUnitConversion(connectionRecType *context)
+static cmdResponseType setLinearUnitConversion(connectionRecType * /*context*/)
 {
    char *s = strtok(NULL, delims);
    switch (checkConversionStr(s)) {
@@ -1301,7 +1301,7 @@ static cmdResponseType setLinearUnitConversion(connectionRecType *context)
    return rtNoError;
 }
 
-static cmdResponseType setAngularUnitConversion(connectionRecType *context)
+static cmdResponseType setAngularUnitConversion(connectionRecType * /*context*/)
 {
    char *s = strtok(NULL, delims);
    switch (checkAngularConversionStr(s)) {
@@ -1315,7 +1315,7 @@ static cmdResponseType setAngularUnitConversion(connectionRecType *context)
    return rtNoError;
 }
 
-static cmdResponseType setTeleopEnable(connectionRecType *context)
+static cmdResponseType setTeleopEnable(connectionRecType * /*context*/)
 {
    char *s = strtok(NULL, delims);
    switch (checkOnOff(s)) {
@@ -1330,7 +1330,7 @@ static cmdResponseType setTeleopEnable(connectionRecType *context)
    return rtNoError;
 }
 
-static cmdResponseType setProbe(connectionRecType *context)
+static cmdResponseType setProbe(connectionRecType * /*context*/)
 {
   float x, y, z;
 
@@ -1353,7 +1353,7 @@ static cmdResponseType setProbe(connectionRecType *context)
   return rtNoError;
 }
 
-static cmdResponseType setProbeClear(connectionRecType *context)
+static cmdResponseType setProbeClear(connectionRecType * /*context*/)
 {
   if(sendClearProbeTrippedFlag() != 0) return rtStandardError;
   return rtNoError;
@@ -1417,7 +1417,7 @@ static cmdResponseType setSpindleOverride(connectionRecType *context)
 	return rtNoError;
 }
 
-static cmdResponseType setOptionalStop(connectionRecType *context)
+static cmdResponseType setOptionalStop(connectionRecType * /*context*/)
 {
   int value;
   char *s = strtok(NULL, delims);

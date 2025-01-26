@@ -51,6 +51,7 @@ int SpaceBetweenRungsY = 25;
 
 static void begin_print(GtkPrintOperation *operation, GtkPrintContext   *context, gpointer           user_data)
 {
+	(void)user_data;
 	NbrPagesToPrint = 0;
 	int PageWidth = gtk_print_context_get_width(context);
 	int PageHeight = gtk_print_context_get_height(context);
@@ -91,6 +92,7 @@ printf( "print sizes: PrintLadderBlockWidth=%d, PrintLadderBlockHeight=%d, Print
 
 static void draw_page( GtkPrintOperation *operation, GtkPrintContext   *context, int page_nr)
 {
+	(void)operation;
 	cairo_t *cr;
 	char Buffer[ 80 ];
 //	int the_width = RUNG_WIDTH*bl_width;
@@ -135,6 +137,9 @@ static void draw_page( GtkPrintOperation *operation, GtkPrintContext   *context,
 
 static void end_print(GtkPrintOperation *operation, GtkPrintContext   *context, gpointer           user_data)
 {
+	(void)operation;
+	(void)context;
+	(void)user_data;
 }
 
 void DoPrint( char DoPreview )

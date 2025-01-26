@@ -90,7 +90,7 @@ int Interp::py_reload()
 }
 
 // determine whether [module.]funcname is callable
-bool Interp::is_pycallable(setup_pointer settings,
+bool Interp::is_pycallable(setup_pointer /*settings*/,
 			   const char *module,
 			   const char *funcname)
 {
@@ -102,7 +102,7 @@ bool Interp::is_pycallable(setup_pointer settings,
 
 // all parameters to/results from Python calls go through the callframe, which looks a bit awkward
 // the reason is not to expose boost.python through the interpreter public interface
-int Interp::pycall(setup_pointer settings,
+int Interp::pycall(setup_pointer /*settings*/,
 		   context_pointer frame,
 		   const char *module,
 		   const char *funcname,

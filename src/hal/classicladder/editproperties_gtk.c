@@ -158,6 +158,9 @@ char * GetProperty(int NumParam)
 
 gint PropertiesWindowDeleteEvent( GtkWidget * widget, GdkEvent * event, gpointer data )
 {
+	(void)widget;
+	(void)event;
+	(void)data;
 	// we do not want that the window be destroyed.
 	return TRUE;
 }

@@ -98,6 +98,7 @@ void DisplaySymbols( void )
 // EMC: added a call to DisplaySymbols() so window updates right away
 void Callback_TextEdited(GtkCellRendererText *cell, gchar *path_string,
 		      gchar *new_text, gpointer data) {
+	(void)cell;
 
 	int OffsetArray = -999;
 	StrSymbol * pSymbol;
@@ -173,6 +174,9 @@ DisplaySymbols();
 
 gint SymbolsWindowDeleteEvent( GtkWidget * widget, GdkEvent * event, gpointer data )
 {
+	(void)widget;
+	(void)event;
+	(void)data;
 	gtk_widget_hide( SymbolsWindow );
 	SetToggleMenuForSymbolsWindow( FALSE/*OpenedWin*/ );
 	// we do not want that the window be destroyed.

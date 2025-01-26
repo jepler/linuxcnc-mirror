@@ -124,6 +124,8 @@ void CopyFunctionBlockPropertiesOrExpr( int NumTypeEle, int NumBlockSrc, int Num
 
 void CopyNowPartSelected( double x,double y )
 {
+	(void)x;
+	(void)y;
 	if ( EditDatas.GhostZonePosiX!=-1 && EditDatas.GhostZonePosiY!=-1 )
 	{
 		int x,srcx,srcy;

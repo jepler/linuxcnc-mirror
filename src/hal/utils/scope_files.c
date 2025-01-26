@@ -434,6 +434,7 @@ static int parse_command(char *in)
 
 static char *dummy_cmd(void * arg)
 {
+    (void)arg;
     return "command not implemented";
 }
 
@@ -527,6 +528,7 @@ static char *chan_cmd(void * arg)
 
 static char *choff_cmd(void * arg)
 {
+    (void)arg;
     int chan_num;
 
     if ( deferred_channel != 0 ) {

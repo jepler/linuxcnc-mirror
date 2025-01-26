@@ -248,6 +248,9 @@ void ButtonCancelCurrentRung()
 
 gint EditorWindowDeleteEvent( GtkWidget * widget, GdkEvent * event, gpointer data )
 {
+	(void)widget;
+	(void)event;
+	(void)data;
 	gtk_widget_hide( EditWindow );
 	SetToggleMenuForEditorWindow( FALSE/*OpenedWin*/ );
 	// we do not want that the window be destroyed.

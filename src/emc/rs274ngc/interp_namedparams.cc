@@ -153,7 +153,7 @@ int Interp::read_named_parameter(
 				 char *line,   //!< string: line of RS274/NGC code being processed
 				 int *counter, //!< pointer to a counter for position on the line
 				 double *double_ptr,   //!< pointer to double to be read
-				 double *parameters,   //!< array of system parameters
+				 double * /*parameters*/,   //!< array of system parameters
 				 bool check_exists)    //!< test for existence, not value
 {
     static char name[] = "read_named_parameter";

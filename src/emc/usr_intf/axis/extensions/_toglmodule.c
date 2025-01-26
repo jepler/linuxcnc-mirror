@@ -27,6 +27,7 @@ static Tcl_Interp *get_interpreter(PyObject *tkapp) {
 }
 
 PyObject *install(PyObject *s, PyObject *arg) {
+    (void)s;
     Tcl_Interp *trp = get_interpreter(arg);
     if(!trp) {
         PyErr_SetString(PyExc_TypeError, "get_interpreter() returned NULL");

@@ -454,7 +454,7 @@ static int max_mdi_queued_commands = MAX_MDI_QUEUE;
   It returns 0 if all messages check out, -1 if any of them fail. If one
   fails, the rest of the list is not checked.
  */
-static int checkInterpList(NML_INTERP_LIST * il, EMC_STAT * stat)
+static int checkInterpList(NML_INTERP_LIST * il, EMC_STAT * /*stat*/)
 {
     while (il->len() > 0) {
 	auto cmd = il->get();

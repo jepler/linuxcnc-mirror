@@ -85,6 +85,6 @@ int
 }
 
 // This constructor declared private to prevent copying
-RCS_SHAREDMEM::RCS_SHAREDMEM(RCS_SHAREDMEM & shm)
+RCS_SHAREDMEM::RCS_SHAREDMEM(RCS_SHAREDMEM & /*shm*/)
 {
 }

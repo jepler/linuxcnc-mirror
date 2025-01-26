@@ -119,31 +119,31 @@ CMS_SERVER_LOCAL_PORT::~CMS_SERVER_LOCAL_PORT()
 }
 
 /* local_port function for reads */
-REMOTE_READ_REPLY *CMS_SERVER_LOCAL_PORT::reader(REMOTE_READ_REQUEST * _req)
+REMOTE_READ_REPLY *CMS_SERVER_LOCAL_PORT::reader(REMOTE_READ_REQUEST * /*_req*/)
 {
     return (NULL);
 }
 
 REMOTE_READ_REPLY *CMS_SERVER_LOCAL_PORT::blocking_read(REMOTE_READ_REQUEST *
-    _req)
+    /*_req*/)
 {
     return (NULL);
 }
 
 /* local_port function for writes */
-REMOTE_WRITE_REPLY *CMS_SERVER_LOCAL_PORT::writer(REMOTE_WRITE_REQUEST * _req)
+REMOTE_WRITE_REPLY *CMS_SERVER_LOCAL_PORT::writer(REMOTE_WRITE_REQUEST * /*_req*/)
 {
     return (NULL);
 }
 
 REMOTE_SET_DIAG_INFO_REPLY *CMS_SERVER_LOCAL_PORT::
-set_diag_info(REMOTE_SET_DIAG_INFO_REQUEST * _req)
+set_diag_info(REMOTE_SET_DIAG_INFO_REQUEST * /*_req*/)
 {
     return (NULL);
 }
 
 REMOTE_GET_DIAG_INFO_REPLY *CMS_SERVER_LOCAL_PORT::
-get_diag_info(REMOTE_GET_DIAG_INFO_REQUEST * _req)
+get_diag_info(REMOTE_GET_DIAG_INFO_REQUEST * /*_req*/)
 {
     get_diag_info_reply.cdi = cms->get_diagnostics_info();
     get_diag_info_reply.status = cms->status;
@@ -151,7 +151,7 @@ get_diag_info(REMOTE_GET_DIAG_INFO_REQUEST * _req)
 }
 
 REMOTE_GET_MSG_COUNT_REPLY *CMS_SERVER_LOCAL_PORT::
-get_msg_count(REMOTE_GET_DIAG_INFO_REQUEST * _req)
+get_msg_count(REMOTE_GET_DIAG_INFO_REQUEST * /*_req*/)
 {
     return (NULL);
 }

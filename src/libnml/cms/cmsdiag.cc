@@ -227,7 +227,7 @@ void CMS::calculate_and_store_diag_info(PHYSMEM_HANDLE * _handle,
 }
 
 void CMS::internal_retrieve_diag_info(PHYSMEM_HANDLE * _handle,
-    void *_user_data)
+    void * /*_user_data*/)
 {
     if (NULL == _handle || !enable_diagnostics) {
 	return;

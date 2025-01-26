@@ -62,7 +62,7 @@ static void map_parports() {
     }
 }
 
-int rtapi_parport_get(const char *mod_name, rtapi_parport_t *port, unsigned short base, unsigned short base_hi, unsigned int modes) {
+int rtapi_parport_get(const char * /*mod_name*/, rtapi_parport_t *port, unsigned short base, unsigned short base_hi, unsigned int modes) {
     WITH_ROOT;
 
     memset(port, 0, sizeof(*port));

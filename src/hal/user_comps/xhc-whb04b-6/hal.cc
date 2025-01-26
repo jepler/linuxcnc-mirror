@@ -221,7 +221,7 @@ Hal::~Hal()
     delete memory;
 }
 // ----------------------------------------------------------------------
-int Hal::newSimulatedHalPin(char* pin_name, void** ptr, int s)
+int Hal::newSimulatedHalPin(char* /*pin_name*/, void** ptr, int s)
 {
     *ptr = calloc(s, 1);
     assert(*ptr != nullptr);
@@ -646,7 +646,7 @@ void Hal::enableVerbose(bool enable)
     }
 }
 // ----------------------------------------------------------------------
-void Hal::setNoAxisActive(bool enabled)
+void Hal::setNoAxisActive(bool /*enabled*/)
 {
     *mHalCout << "hal   OFF no axis active" << endl;
 }

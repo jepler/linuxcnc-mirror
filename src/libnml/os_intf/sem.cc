@@ -106,6 +106,6 @@ int RCS_SEMAPHORE::clear()
 }
 
 // This constructor declared private to prevent copying.
-RCS_SEMAPHORE::RCS_SEMAPHORE(RCS_SEMAPHORE & sem)
+RCS_SEMAPHORE::RCS_SEMAPHORE(RCS_SEMAPHORE & /*sem*/)
 {
 }

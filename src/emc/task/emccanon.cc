@@ -500,7 +500,7 @@ void USE_LENGTH_UNITS(CANON_UNITS in_unit)
 }
 
 /* Free Space Motion */
-void SET_TRAVERSE_RATE(double rate)
+void SET_TRAVERSE_RATE(double /*rate*/)
 {
     // nothing need be done here
 }
@@ -536,7 +536,7 @@ void SET_FEED_RATE(double rate)
     }
 }
 
-void SET_FEED_REFERENCE(CANON_FEED_REFERENCE reference)
+void SET_FEED_REFERENCE(CANON_FEED_REFERENCE /*reference*/)
 {
     // nothing need be done here
 }
@@ -1214,12 +1214,12 @@ void SELECT_PLANE(CANON_PLANE in_plane)
     canon.activePlane = in_plane;
 }
 
-void SET_CUTTER_RADIUS_COMPENSATION(double radius)
+void SET_CUTTER_RADIUS_COMPENSATION(double /*radius*/)
 {
     // nothing need be done here
 }
 
-void START_CUTTER_RADIUS_COMPENSATION(int side)
+void START_CUTTER_RADIUS_COMPENSATION(int /*side*/)
 {
     // nothing need be done here
 }
@@ -1382,7 +1382,7 @@ biarc(int lineno, double p0x, double p0y, double tsx, double tsy,
 void NURBS_G5_FEED(int lineno,
 		   std::vector<NURBS_CONTROL_POINT>
 		   nurbs_control_points, unsigned int nurbs_order,
-		   CANON_PLANE plane)
+		   CANON_PLANE /*plane*/)
 {
 	flush_segments();
 
@@ -1859,7 +1859,7 @@ void NURBS_FEED_G6_2_WITH_BIARCH_DU_CONST(int lineno,
 					  std::vector<NURBS_G6_CONTROL_POINT>
 					  nurbs_control_points,
 					  std::vector<double> knot_vector,
-					  unsigned int k, double feedrate)
+					  unsigned int k, double /*feedrate*/)
 {
 	double u = knot_vector[0];
 	int dim = nurbs_control_points.size();
@@ -2191,7 +2191,7 @@ void NURBS_FEED_NO_SUBDIVISION(int lineno,
 void NURBS_G6_FEED(int lineno,
 		   std::vector<NURBS_G6_CONTROL_POINT>
 		   nurbs_control_points, unsigned int nurbs_order,
-		   double feedrate, int Q_option, CANON_PLANE plane)
+		   double feedrate, int Q_option, CANON_PLANE /*plane*/)
 {				// (L_option: NICU, NICL, NICC see publication from Lo Valvo and Drago) 
 	int n = nurbs_control_points.size() - 1 - nurbs_order;
 	std::vector<double> knot_vector =
@@ -2960,7 +2960,7 @@ void RELOAD_TOOLDATA(void)
 
 /* Misc Functions */
 
-void CLAMP_AXIS(CANON_AXIS axis)
+void CLAMP_AXIS(CANON_AXIS /*axis*/)
 {
     /*! \todo FIXME-- unimplemented */
 }
@@ -3220,7 +3220,7 @@ void TURN_PROBE_ON()
     SIMPLE_COMMAND_<EMC_TRAJ_CLEAR_PROBE_TRIPPED_FLAG, false>();
 }
 
-void UNCLAMP_AXIS(CANON_AXIS axis)
+void UNCLAMP_AXIS(CANON_AXIS /*axis*/)
 {
     /*! \todo FIXME-- unimplemented */
 }
@@ -3853,7 +3853,7 @@ CANON_PLANE GET_EXTERNAL_PLANE()
 }
 
 /* returns current value of the digital input selected by index.*/
-int GET_EXTERNAL_DIGITAL_INPUT(int index, int def)
+int GET_EXTERNAL_DIGITAL_INPUT(int index, int /*def*/)
 {
     if ((index < 0) || (index >= EMCMOT_MAX_DIO))
 	return -1;
@@ -3867,7 +3867,7 @@ int GET_EXTERNAL_DIGITAL_INPUT(int index, int def)
     return (emcStatus->motion.synch_di[index] != 0) ? 1 : 0;
 }
 
-double GET_EXTERNAL_ANALOG_INPUT(int index, double def)
+double GET_EXTERNAL_ANALOG_INPUT(int index, double /*def*/)
 {
 /* returns current value of the analog input selected by index.*/
 #ifdef INPUT_DEBUG
@@ -4087,7 +4087,7 @@ int UNLOCK_ROTARY(int line_number, int joint_num)
     return 0;
 }
 
-int LOCK_ROTARY(int line_number, int joint_num) {
+int LOCK_ROTARY(int /*line_number*/, int /*joint_num*/) {
     canon.rotary_unlock_for_traverse = -1;
     return 0;
 }

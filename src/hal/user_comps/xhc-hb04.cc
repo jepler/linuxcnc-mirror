@@ -509,6 +509,7 @@ void setup_asynch_transfer(libusb_device_handle *dev_handle)
 
 static void quit(int sig)
 {
+	(void)sig;
 	do_exit = 1;
 }
 

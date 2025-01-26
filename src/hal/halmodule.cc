@@ -231,6 +231,7 @@ static PyObject *pyhal_error(int code) {
 }
 
 static int pyhal_init(PyObject *_self, PyObject *args, PyObject *kw) {
+    (void)kw;
     char *name;
     char *prefix = 0;
     halobject *self = (halobject *)_self;
@@ -521,7 +522,7 @@ static PyObject *pyhal_get_pin(PyObject *_self, PyObject *o) {
 }
 
 
-static PyObject *pyhal_get_pins(PyObject *_self, PyObject *o) {
+static PyObject *pyhal_get_pins(PyObject *_self, PyObject * /*o*/) {
   char *name;
   halobject *self = (halobject *)_self;
 
@@ -537,7 +538,7 @@ static PyObject *pyhal_get_pins(PyObject *_self, PyObject *o) {
 }
 
 
-static PyObject *pyhal_ready(PyObject *_self, PyObject *o) {
+static PyObject *pyhal_ready(PyObject *_self, PyObject * /*o*/) {
     // hal_ready did not exist in EMC 2.0.x, make it a no-op
     halobject *self = (halobject *)_self;
     EXCEPTION_IF_NOT_LIVE(NULL);
@@ -546,7 +547,7 @@ static PyObject *pyhal_ready(PyObject *_self, PyObject *o) {
     Py_RETURN_NONE;
 }
 
-static PyObject *pyhal_unready(PyObject *_self, PyObject *o) {
+static PyObject *pyhal_unready(PyObject *_self, PyObject * /*o*/) {
     // hal_ready did not exist in EMC 2.0.x, make it a no-op
     halobject *self = (halobject *)_self;
     EXCEPTION_IF_NOT_LIVE(NULL);
@@ -555,7 +556,7 @@ static PyObject *pyhal_unready(PyObject *_self, PyObject *o) {
     Py_RETURN_NONE;
 }
 
-static PyObject *pyhal_exit(PyObject *_self, PyObject *o) {
+static PyObject *pyhal_exit(PyObject *_self, PyObject * /*o*/) {
     halobject *self = (halobject *)_self;
     pyhal_exit_impl(self);
     Py_RETURN_NONE;
@@ -750,7 +751,7 @@ static PyObject *pyhalpin_repr(PyObject *_self) {
             pin_type2name(self->type), pin_dir2name(self->dir.pindir));
 }
 
-static int pyhalpin_init(PyObject *_self, PyObject *, PyObject *) {
+static int pyhalpin_init(PyObject * /*_self*/, PyObject *, PyObject *) {
     PyErr_Format(PyExc_RuntimeError,
 	    "Cannot be constructed directly");
     return -1;
@@ -882,7 +883,7 @@ static PyObject * pyhal_pin_new(halitem * pin, const char * name) {
     return (PyObject *) pypin;
 }
 
-PyObject *pin_has_writer(PyObject *self, PyObject *args) {
+PyObject *pin_has_writer(PyObject * /*self*/, PyObject *args) {
     char *name;
     if(!PyArg_ParseTuple(args, "s", &name)) return NULL;
     if(!hal_shmem_base) {
@@ -906,7 +907,7 @@ PyObject *pin_has_writer(PyObject *self, PyObject *args) {
 }
 
 
-PyObject *component_exists(PyObject *self, PyObject *args) {
+PyObject *component_exists(PyObject * /*self*/, PyObject *args) {
     char *name;
     if(!PyArg_ParseTuple(args, "s", &name)) return NULL;
     if(!hal_shmem_base) {
@@ -918,7 +919,7 @@ PyObject *component_exists(PyObject *self, PyObject *args) {
     return PyBool_FromLong(halpr_find_comp_by_name(name) != NULL);
 }
 
-PyObject *component_is_ready(PyObject *self, PyObject *args) {
+PyObject *component_is_ready(PyObject * /*self*/, PyObject *args) {
     char *name;
     if(!PyArg_ParseTuple(args, "s", &name)) return NULL;
     if(!hal_shmem_base) {
@@ -932,7 +933,7 @@ PyObject *component_is_ready(PyObject *self, PyObject *args) {
     return PyBool_FromLong((thecomp) && (thecomp->ready != 0));
 }
 
-PyObject *new_sig(PyObject *self, PyObject *args) {
+PyObject *new_sig(PyObject * /*self*/, PyObject *args) {
     char *name;
     int type,retval;
     if(!PyArg_ParseTuple(args, "si", &name,&type)) return NULL;
@@ -968,7 +969,7 @@ PyObject *new_sig(PyObject *self, PyObject *args) {
     return PyBool_FromLong(retval != 0);
 }
 
-PyObject *connect(PyObject *self, PyObject *args) {
+PyObject *connect(PyObject * /*self*/, PyObject *args) {
     char *signame,*pinname;
     if(!PyArg_ParseTuple(args, "ss", &pinname,&signame)) return NULL;
     if(!hal_shmem_base) {
@@ -980,7 +981,7 @@ PyObject *connect(PyObject *self, PyObject *args) {
     return PyBool_FromLong(hal_link(pinname, signame) != 0);
 }
 
-PyObject *disconnect(PyObject *self, PyObject *args) {
+PyObject *disconnect(PyObject * /*self*/, PyObject *args) {
     char *pinname;
     if(!PyArg_ParseTuple(args, "s", &pinname)) return NULL;
     if(!hal_shmem_base) {
@@ -1082,7 +1083,7 @@ static int set_common(hal_type_t type, void *d_ptr, char *value) {
     return retval;
 }
 
-PyObject *set_p(PyObject *self, PyObject *args) {
+PyObject *set_p(PyObject * /*self*/, PyObject *args) {
     char *name,*value;
     int retval;
     hal_param_t *param;
@@ -1146,7 +1147,7 @@ PyObject *set_p(PyObject *self, PyObject *args) {
     return PyBool_FromLong(retval != 0);
 }
 
-PyObject *set_s(PyObject *self, PyObject *args) {
+PyObject *set_s(PyObject * /*self*/, PyObject *args) {
     char *name,*value;
     int retval;
     hal_sig_t *sig;
@@ -1185,7 +1186,7 @@ PyObject *set_s(PyObject *self, PyObject *args) {
 
 /*######################################*/
 /* Get a Pin, Param or signal value     */
-PyObject *get_value(PyObject *self, PyObject *args) {
+PyObject *get_value(PyObject * /*self*/, PyObject *args) {
     char *name;
     hal_param_t *param;
     hal_pin_t *pin;
@@ -1276,7 +1277,7 @@ PyObject *get_value(PyObject *self, PyObject *args) {
 
 /*######################################*/
 /* Get a dict of pin info for all pins in system */
-PyObject *get_info_pins(PyObject *self, PyObject *args) {
+PyObject *get_info_pins(PyObject * /*self*/, PyObject * /*args*/) {
     SHMFIELD(hal_pin_t) next;
     int type;
     char str_n[] = "NAME";
@@ -1365,7 +1366,7 @@ PyObject *get_info_pins(PyObject *self, PyObject *args) {
 
 /*######################################*/
 /* Get a dict of signal info for all signals in system */
-PyObject *get_info_signals(PyObject *self, PyObject *args) {
+PyObject *get_info_signals(PyObject * /*self*/, PyObject * /*args*/) {
     SHMFIELD(hal_sig_t) next;
     int type;
     char str_n[] = "NAME";
@@ -1450,7 +1451,7 @@ PyObject *get_info_signals(PyObject *self, PyObject *args) {
 
 /*######################################*/
 /* Get a dict of parameter info for all parameters in system */
-PyObject *get_info_params(PyObject *self, PyObject *args) {
+PyObject *get_info_params(PyObject * /*self*/, PyObject * /*args*/) {
     SHMFIELD(hal_param_t) next;
     int type;
     char str_n[] = "NAME";
@@ -1528,7 +1529,7 @@ struct shmobject {
     void *buf;
 };
 
-static int pyshm_init(PyObject *_self, PyObject *args, PyObject *kw) {
+static int pyshm_init(PyObject *_self, PyObject *args, PyObject * /*kw*/) {
     shmobject *self = (shmobject *)_self;
     self->comp = 0;
     self->shm_id = -1;
@@ -1558,7 +1559,7 @@ static void pyshm_delete(PyObject *_self) {
     Py_XDECREF(self->comp);
 }
 
-static int shm_buffer_getbuffer(PyObject *obj, Py_buffer *view, int flags) {
+static int shm_buffer_getbuffer(PyObject *obj, Py_buffer *view, int /*flags*/) {
   if (view == NULL) {
     PyErr_SetString(PyExc_ValueError, "NULL view in getbuffer");
     return -1;
@@ -1585,13 +1586,13 @@ static PyObject *shm_setsize(PyObject *_self, PyObject *args) {
 }
 
 
-static PyObject *shm_getbuffer(PyObject *_self, PyObject *dummy) {
+static PyObject *shm_getbuffer(PyObject *_self, PyObject * /*dummy*/) {
 
     shmobject *self = (shmobject *)_self;
     return (PyObject*)PyMemoryView_FromObject((PyObject*)self);
 }
 
-static PyObject *set_msg_level(PyObject *_self, PyObject *args) {
+static PyObject *set_msg_level(PyObject * /*_self*/, PyObject *args) {
     int level, res;
     if(!PyArg_ParseTuple(args, "i", &level)) return NULL;
     res = rtapi_set_msg_level(level);
@@ -1599,7 +1600,7 @@ static PyObject *set_msg_level(PyObject *_self, PyObject *args) {
     Py_RETURN_NONE;
 }
 
-static PyObject *get_msg_level(PyObject *_self, PyObject *args) {
+static PyObject *get_msg_level(PyObject * /*_self*/, PyObject * /*args*/) {
     return PyLong_FromLong(rtapi_get_msg_level());
 }
 
@@ -1684,7 +1685,7 @@ struct streamobj {
     unsigned sampleno;
 };
 
-static int pystream_init(PyObject *_self, PyObject *args, PyObject *kw) {
+static int pystream_init(PyObject *_self, PyObject *args, PyObject * /*kw*/) {
     int depth=0;
     char *typestring=NULL;
 
@@ -1740,7 +1741,7 @@ static int pystream_init(PyObject *_self, PyObject *args, PyObject *kw) {
     return 0;
 }
 
-PyObject *stream_read(PyObject *_self, PyObject *unused) {
+PyObject *stream_read(PyObject *_self, PyObject * /*unused*/) {
     streamobj *self = (streamobj *)_self;
     int n = PyBytes_Size(self->pyelt);
     if(n <= 0)
@@ -1821,7 +1822,7 @@ PyObject *stream_getter(PyObject *_self, void *vfp) {
     return to_python(result);
 }
 
-PyObject *stream_element_types(PyObject *_self, void *unused) {
+PyObject *stream_element_types(PyObject *_self, void * /*unused*/) {
     streamobj *self = reinterpret_cast<streamobj*>(_self);
     if(!self->pyelt) {
     }

@@ -428,6 +428,7 @@ int rtapi_request_firmware(const struct rtapi_firmware **fw, const char *name, s
     struct stat st;
     int r;
     int fd = -1;
+    (void)device;
 
     /* Allocate and initialize a firmware struct */
     lfw = new rtapi_firmware;

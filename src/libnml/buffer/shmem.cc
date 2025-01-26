@@ -54,7 +54,7 @@ static inline bool not_zero(double x)
 /* SHMEM Member Functions. */
 
 /* Constructor for hard coded tests. */
-SHMEM::SHMEM(const char *n, long s, int nt, key_t k, int m):CMS(s)
+SHMEM::SHMEM(const char * /*n*/, long s, int /*nt*/, key_t k, int m):CMS(s)
 {
     /* Set pointers to null so only properly opened pointers are closed. */
     shm = NULL;

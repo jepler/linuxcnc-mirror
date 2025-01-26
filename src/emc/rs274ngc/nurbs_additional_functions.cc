@@ -264,7 +264,7 @@ NURBS_PLANE_POINT nurbs_G6_point(double u, unsigned int k, std::vector<NURBS_G6_
 	return point;
 	}
 
-double nurbs_Rdenx(double u, unsigned int k, std::vector<NURBS_G6_CONTROL_POINT> nurbs_control_points, std::vector<double> knot_vector, std::vector< std::vector<double> > A6)
+double nurbs_Rdenx(double /*u*/, unsigned int k, std::vector<NURBS_G6_CONTROL_POINT> nurbs_control_points, std::vector<double> /*knot_vector*/, std::vector< std::vector<double> > A6)
 	{
 	unsigned int i;
 	double d = 0.0;
@@ -810,7 +810,7 @@ std::vector<double> nurbs_lenght_vector_creator(unsigned int k,	std::vector<NURB
 ///////////////////////////////////////////////////////////////////////////////////////
 
 // Funzione per calcolare la lunghezza totale della curva fino all'intervallo di integrazione dello span knot di estremo superiore bj, [aj,bj] dove j individua l'ultimo intervallo di integrazione.
-double nurbs_lenght_tot(int j, std::vector<double> span_knot_vector, std::vector<double> lenght_vector)
+double nurbs_lenght_tot(int j, std::vector<double> /*span_knot_vector*/, std::vector<double> lenght_vector)
 	{
 	double ltot=0;
 	for(int i=0; i<=j; ++i)

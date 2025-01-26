@@ -777,6 +777,6 @@ int LinkedList::get_current_id()
 }
 
 // Constructor defined private to prevent copying.
-LinkedList::LinkedList(LinkedList & list)
+LinkedList::LinkedList(LinkedList & /*list*/)
 {
 }

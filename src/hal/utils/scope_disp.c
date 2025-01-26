@@ -469,6 +469,9 @@ static int select_trace(int x, int y) {
 }
 
 static int handle_release(GtkWidget *widget, GdkEventButton *event, gpointer data) {
+    (void)widget;
+    (void)event;
+    (void)data;
     return 1;
 }
 
@@ -499,6 +502,8 @@ static void change_zoom(int dir, int x) {
 }
 
 static int handle_click(GtkWidget *widget, GdkEventButton *event, gpointer data) {
+    (void)widget;
+    (void)data;
     scope_vert_t *vert = &(ctrl_usr->vert);
     scope_disp_t *disp = &(ctrl_usr->disp);
     motion_y = event->y;
@@ -535,6 +540,8 @@ static int get_cursor_info(double *t, double *p, double *v) {
 }
 
 static int handle_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer data) {
+    (void)widget;
+    (void)data;
     change_zoom(event->direction ? -1 : 1, event->x);
     return TRUE;
 }
@@ -584,6 +591,8 @@ static void left_drag(int dy, int y, GdkModifierType state) {
 }
 
 static int handle_motion(GtkWidget *widget, GdkEventButton *event, gpointer data) {
+    (void)widget;
+    (void)data;
     scope_disp_t *disp = &(ctrl_usr->disp);
     GdkModifierType mod;
     int x, y;
@@ -948,6 +957,8 @@ void conflict_avoid(int *y, int h) {
 static void update_drawing_size(GtkWidget *widget, GdkEventConfigure *event,
         gpointer data)
 {
+    (void)event;
+    (void)data;
     scope_disp_t *disp;
     disp = &(ctrl_usr->disp);
 

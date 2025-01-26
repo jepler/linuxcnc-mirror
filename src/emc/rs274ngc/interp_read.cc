@@ -288,7 +288,7 @@ present only so that this will have the same argument list as the other
 int Interp::read_comment(char *line,     //!< string: line of RS274 code being processed   
                         int *counter,   //!< pointer to a counter for position on the line
                         block_pointer block,    //!< pointer to a block being filled from the line
-                        double *parameters)     //!< array of system parameters                   
+                        double * /*parameters*/)     //!< array of system parameters
 {
   int n;
 
@@ -307,8 +307,8 @@ int Interp::read_comment(char *line,     //!< string: line of RS274 code being p
 
 int Interp::read_semicolon(char *line,     //!< string: line of RS274 code being processed   
                            int *counter,   //!< pointer to a counter for position on the line
-                           block_pointer block,    //!< pointer to a block being filled from the line
-                           double *parameters)     //!< array of system parameters                   
+                           block_pointer /*block*/,    //!< pointer to a block being filled from the line
+                           double * /*parameters*/)     //!< array of system parameters
 {
     CHKS((line[*counter] != ';'), NCE_BUG_FUNCTION_SHOULD_NOT_HAVE_BEEN_CALLED);
     (*counter) = strlen(line);
@@ -2147,7 +2147,7 @@ to be evaluated. That situation is handled by read_parameter.
 int Interp::read_parameter_setting(
     char *line,   //!< string: line of RS274/NGC code being processed
     int *counter, //!< pointer to a counter for position on the line 
-    block_pointer block,  //!< pointer to a block being filled from the line 
+    block_pointer /*block*/,  //!< pointer to a block being filled from the line
     double *parameters)   //!< array of system parameters
 {
   static char name[] = "read_parameter_setting";
@@ -2273,7 +2273,7 @@ int Interp::read_named_parameter_setting(
     char *line,   //!< string: line of RS274/NGC code being processed
     int *counter, //!< pointer to a counter for position on the line 
     char **param,  //!< pointer to the char * to be returned 
-    double *parameters)   //!< array of system parameters
+    double * /*parameters*/)   //!< array of system parameters
 {
   static char name[] = "read_named_parameter_setting";
   int status;

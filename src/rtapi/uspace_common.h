@@ -62,6 +62,7 @@ int rtapi_shmem_new(int key, int module_id, unsigned long int size)
 #ifdef RTAPI
   WITH_ROOT;
 #endif
+  (void)module_id;
   rtapi_shmem_handle *shmem;
   int i;
 
@@ -185,6 +186,7 @@ int rtapi_shmem_delete(int handle, int module_id)
   struct shmid_ds d;
   int r1, r2;
   rtapi_shmem_handle *shmem;
+  (void)module_id;
 
   if(handle < 0 || handle >= MAX_SHM)
     return -EINVAL;
@@ -307,6 +309,7 @@ typedef struct {
 static         int  uuid_mem_id = 0;
 int rtapi_init(const char *modname)
 {
+    (void)modname;
     static uuid_data_t* uuid_data   = 0;
     static const   int  uuid_id     = 0;
 
@@ -422,6 +425,7 @@ static int rtapi_clock_nanosleep(clockid_t clock_id, int flags,
         const struct timespec *prequest, struct timespec *remain,
         const struct timespec *pnow)
 {
+    (void)pnow;
 #if defined(HAVE_CLOCK_NANOSLEEP)
     return clock_nanosleep(clock_id, flags, prequest, remain);
 #else

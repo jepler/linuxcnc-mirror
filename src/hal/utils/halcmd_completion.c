@@ -561,6 +561,7 @@ static char *nextword(char *s) {
 }
 
 char **halcmd_completer(const char *text, int start, int end, hal_completer_func func, char *buffer) {
+    (void)end;
     int i;
     char **result = NULL, *n;
 

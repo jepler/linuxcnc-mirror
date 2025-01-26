@@ -52,10 +52,12 @@ static int init() {
     return result;
 }
 static void halExit(ClientData d) {
+    (void)d;
     shutdown();
 }
 
 static int halCmd(ClientData cd, Tcl_Interp *interp, int argc, const char **argv) {
+    (void)cd;
     int result;
     Tcl_ResetResult(interp);
 

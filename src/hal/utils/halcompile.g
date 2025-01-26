@@ -390,6 +390,7 @@ static int comp_id;
         print("static int export(char *prefix, long extra_arg, long personality) {", file=f)
     else:
         print("static int export(char *prefix, long extra_arg) {", file=f)
+    print("    (void)extra_arg;", file=f)
     if len(functions) > 0:
         print("    char buf[HAL_NAME_LEN + 1];", file=f)
     print("    int r = 0;", file=f)

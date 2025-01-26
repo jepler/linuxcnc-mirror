@@ -285,7 +285,7 @@ int Interp::convert_cycle_g74_g84(block_pointer block,
                                  double clear_z,    //!< z-value of clearance plane
                                  double bottom_z,   //!< value of z at bottom of cycle
                                  CANON_DIRECTION direction, //!< direction spindle turning at outset
-                                 CANON_SPEED_FEED_MODE mode,       //!< the speed-feed mode at outset
+                                 CANON_SPEED_FEED_MODE /*mode*/,       //!< the speed-feed mode at outset
                                  int motion, double dwell, int spindle)
 {
 

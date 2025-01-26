@@ -72,6 +72,7 @@ int SocketRunning = 0;
 /* TODO: Add support for Modbus/UDP. TCP sucks for a such serial protocol ! ;-) */
 void InitSocketServer( int UseUdpMode, int PortNbr )
 {
+	(void)UseUdpMode;
 
 	int Error = 0;
 #ifdef __WIN32__

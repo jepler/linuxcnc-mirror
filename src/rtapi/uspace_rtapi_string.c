@@ -36,6 +36,7 @@
  */
 char *rtapi_kstrndup(const char *s, size_t max, rtapi_gfp_t gfp)
 {
+	(void)gfp;
 	size_t len;
 	char *buf;
 

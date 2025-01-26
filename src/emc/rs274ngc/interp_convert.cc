@@ -1818,7 +1818,7 @@ int Interp::convert_axis_offsets(int g_code,     //!< g_code being executed (mus
 
 #define VAL_LEN 30
 
-int Interp::convert_param_comment(char *comment, char *expanded, int len)
+int Interp::convert_param_comment(char *comment, char *expanded, int /*len*/)
 {
     FORCE_LC_NUMERIC_C;
     int i;
@@ -2756,7 +2756,7 @@ Called by: convert_g.
 
 */
 
-int Interp::convert_dwell(setup_pointer settings, double time)   //!< time in seconds to dwell  */
+int Interp::convert_dwell(setup_pointer /*settings*/, double time)   //!< time in seconds to dwell  */
 {
   enqueue_DWELL(time);
   return INTERP_OK;
@@ -2977,7 +2977,7 @@ Saves the absolute coordinates of the current point in parameters 5161-5169
 
 */
 
-int Interp::convert_savehome(int code, block_pointer block, setup_pointer s) {
+int Interp::convert_savehome(int code, block_pointer /*block*/, setup_pointer s) {
     double *p = s->parameters;
 
     if(s->cutter_comp_side != CUTTER_COMP::OFF) {
@@ -3357,7 +3357,7 @@ int Interp::convert_length_units(int g_code,     //!< g_code being executed (mus
  */
 int Interp::gen_settings(
     int *int_current, int *int_saved,            // G-codes
-    double *float_current, double *float_saved,  // S, F, other
+    double * /*float_current*/, double *float_saved,  // S, F, other
     std::string &cmd)                            // command buffer
 {
     FORCE_LC_NUMERIC_C;
@@ -3534,7 +3534,7 @@ int Interp::gen_m_codes(int *current, int *saved, std::string &cmd)
  * motion line, but does not restore M codes.
  */
 int Interp::gen_restore_cmd(int *current_g,
-			    int *current_m,
+			    int * /*current_m*/,
 			    double *current_settings,
 			    StateTag const &saved,
 			    std::string &cmd)

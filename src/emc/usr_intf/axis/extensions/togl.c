@@ -1599,7 +1599,7 @@ static LRESULT CALLBACK Win32WinProc( HWND hwnd, UINT message,
 static Window Togl_CreateWindow(Tk_Window tkwin,
 				Window parent, 
 				ClientData instanceData) {
-  
+  (void)tkwin;
   struct Togl *togl = (struct Togl*) instanceData;
   XVisualInfo *visinfo = NULL;
   Display *dpy;

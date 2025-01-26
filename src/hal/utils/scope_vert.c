@@ -644,16 +644,20 @@ static void init_vert_info_window(void)
 
 static void scale_changed(GtkAdjustment * adj, gpointer gdata)
 {
+    (void)gdata;
     set_vert_scale(gtk_adjustment_get_value(adj));
 }
 
 static void pos_changed(GtkAdjustment * adj, gpointer gdata)
 {
+    (void)gdata;
     set_vert_pos(gtk_adjustment_get_value(adj) / VERT_POS_RESOLUTION);
 }
 
 static void offset_button(GtkWidget * widget, gpointer gdata)
 {
+    (void)widget;
+    (void)gdata;
     scope_vert_t *vert;
     scope_chan_t *chan;
     int chan_num;
@@ -757,6 +761,7 @@ static gboolean dialog_set_offset(int chan_num)
 
 static void offset_changed(GtkEditable * editable, struct offset_data *data)
 {
+    (void)editable;
     const char *text;
 
     /* maybe user hit "ac coupled" button" */
@@ -775,6 +780,7 @@ static void offset_changed(GtkEditable * editable, struct offset_data *data)
  */
 static void offset_activated(GtkEntry *entry, GtkWidget *dialog)
 {
+    (void)entry;
     gtk_dialog_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
 }
 
@@ -859,6 +865,8 @@ static void chan_sel_button(GtkWidget * widget, gpointer gdata)
 
 static void change_source_button(GtkWidget * widget, gpointer gdata)
 {
+    (void)widget;
+    (void)gdata;
     int chan_num;
 
     chan_num = ctrl_usr->vert.selected;
@@ -877,6 +885,9 @@ static void change_source_button(GtkWidget * widget, gpointer gdata)
 static void change_page(GtkNotebook *notebook, GtkWidget *page,
                         guint page_num, gpointer user_data)
 {
+    (void)notebook;
+    (void)page;
+    (void)user_data;
     scope_vert_t *vert;
 
     vert = &(ctrl_usr->vert);
@@ -1057,6 +1068,9 @@ static void selection_changed(GtkTreeSelection *selection, char *name)
 static void selection_made(GtkTreeView *treeview, GtkTreePath *path,
                            GtkTreeViewColumn *col, GtkWidget *dialog)
 {
+    (void)treeview;
+    (void)path;
+    (void)col;
     gtk_dialog_response(GTK_DIALOG(dialog), GTK_RESPONSE_ACCEPT);
 }
 

@@ -126,6 +126,8 @@ printf("select... before=%d scan=%d\n", SectionNbrSelected, NumSec );
 
 void TreeViewCursorChangedSignal( GtkTreeView * treeview, gpointer user_data )
 {
+	(void)treeview;
+	(void)user_data;
 	if ( !BlockTreeViewCursorChangedSignal )
 	{
 		printf("cursor-changed signal !\n");
@@ -286,6 +288,9 @@ printf("NumSectionCurrentlySelected=%d\n", SectionNbrSelected);
 }
 gint AddSectionWindowDeleteEvent( GtkWidget * widget, GdkEvent * event, gpointer data )
 {
+	(void)widget;
+	(void)event;
+	(void)data;
 	// we just want to hide the window
 	gtk_widget_hide( AddSectionWindow );
 	// we do not want that the window be destroyed.
@@ -353,6 +358,9 @@ void ButtonMoveDownClickSignal( )
 
 gint ManagerWindowDeleteEvent( GtkWidget * widget, GdkEvent * event, gpointer data )
 {
+	(void)widget;
+	(void)event;
+	(void)data;
 // Here, we must only toggle the menu check that will call itself the function below to close the window ...
 //	gtk_widget_hide( ManagerWindow );
 	SetToogleMenuForSectionsManagerWindow( FALSE/*OpenedWin*/ );

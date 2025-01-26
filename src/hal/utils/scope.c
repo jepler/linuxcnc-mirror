@@ -236,6 +236,7 @@ int main(int argc, gchar * argv[])
 
 static int heartbeat(gpointer data)
 {
+    (void)data;
     refresh_state_info();
     /* check watchdog */
     if (ctrl_shm->watchdog < 10) {
@@ -752,15 +753,20 @@ static void exit_from_hal(void)
 
 static void main_window_closed(GtkWidget * widget, gpointer * gdata)
 {
+    (void)widget;
+    (void)gdata;
     quit(0);
 }
 
 static void set_focus(GtkWindow *window, GtkWidget *widget, gpointer *data) {
+    (void)widget;
+    (void)data;
     gtk_window_set_urgency_hint(window, FALSE);
 }
 
 static void quit(int sig)
 {
+    (void)sig;
     gtk_main_quit();
 }
 
@@ -792,6 +798,7 @@ int set_run_mode(int mode)
 
 static void rm_normal_button_clicked(GtkWidget * widget, gpointer * gdata)
 {
+    (void)gdata;
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) != TRUE) {
 	/* not pressed, ignore it */
 	return;
@@ -804,6 +811,7 @@ static void rm_normal_button_clicked(GtkWidget * widget, gpointer * gdata)
 
 static void rm_single_button_clicked(GtkWidget * widget, gpointer * gdata)
 {
+    (void)gdata;
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) != TRUE) {
 	/* not pressed, ignore it */
 	return;
@@ -816,6 +824,7 @@ static void rm_single_button_clicked(GtkWidget * widget, gpointer * gdata)
 
 static void rm_roll_button_clicked(GtkWidget * widget, gpointer * gdata)
 {
+    (void)gdata;
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) != TRUE) {
 	/* not pressed, ignore it */
 	return;
@@ -828,6 +837,7 @@ static void rm_roll_button_clicked(GtkWidget * widget, gpointer * gdata)
 
 static void rm_stop_button_clicked(GtkWidget * widget, gpointer * gdata)
 {
+    (void)gdata;
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) != TRUE) {
 	/* not pressed, ignore it */
 	return;

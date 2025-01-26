@@ -118,7 +118,7 @@ char *Canterp::stack_name(int index, char *buf, size_t buflen) {
     return buf;
 }
 
-int Canterp::ini_load(const char *inifile) {
+int Canterp::ini_load(const char * /*inifile*/) {
     return 0;
 }
 
@@ -687,7 +687,7 @@ int Canterp::execute(const char *line) {
     return INTERP_ERROR;
 }
 
-int Canterp::execute(const char *line, int line_number) {
+int Canterp::execute(const char *line, int /*line_number*/) {
     return execute(line);
 }
 
@@ -745,15 +745,15 @@ void Canterp::active_g_codes(int gees[ACTIVE_G_CODES]) { std::fill(gees, gees + 
 void Canterp::active_m_codes(int emms[ACTIVE_M_CODES]) { std::fill(emms, emms + ACTIVE_M_CODES, 0); }
 void Canterp::active_settings(double sets[ACTIVE_SETTINGS]) { std::fill(sets, sets + ACTIVE_SETTINGS, 0.0); }
 //NOT necessary for canterp
-int Canterp::restore_from_tag(StateTag const &tag) {return -1;}
-void Canterp::print_state_tag(StateTag const &tag) {}
+int Canterp::restore_from_tag(StateTag const & /*tag*/) {return -1;}
+void Canterp::print_state_tag(StateTag const & /*tag*/) {}
 
 int Canterp::active_modes(int g_codes[ACTIVE_G_CODES],
 			  int m_codes[ACTIVE_M_CODES],
 			  double settings[ACTIVE_SETTINGS],
-			  StateTag const &tag){ return -1;}
+			  StateTag const & /*tag*/){ (void)g_codes; (void)m_codes; (void)settings; return -1;}
 
-void Canterp::set_loglevel(int level) {}
-void Canterp::set_loop_on_main_m99(bool state) {}
+void Canterp::set_loglevel(int /*level*/) {}
+void Canterp::set_loop_on_main_m99(bool /*state*/) {}
 
 InterpBase *makeInterp() { return new Canterp; }

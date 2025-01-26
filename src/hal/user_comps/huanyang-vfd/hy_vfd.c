@@ -143,6 +143,7 @@ typedef struct {
 
 static int done;
 static void quit_signal_handler(int sig) {
+    (void)sig;
     done = 1;
 }
 
@@ -196,6 +197,7 @@ int match_string(char *string, char **matches) {
 }
 
 void usage(int argc, char **argv) {
+	(void)argc;
 	printf("Usage:  %s [options]\n", argv[0]);
 	printf(
 			"This is a userspace HAL program, typically loaded using the halcmd \"loadusr\" command:\n"

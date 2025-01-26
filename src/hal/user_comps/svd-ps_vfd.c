@@ -109,6 +109,7 @@ static char *stopstrings[] = {"1", "2", NULL};
 
 
 static void quit(int sig) {
+    (void)sig;
     done = 1;
 }
 
@@ -132,6 +133,7 @@ int match_string(char *string, char **matches) {
 
 
 void usage(int argc, char **argv) {
+    (void)argc;
     printf("Usage:  %s [ARGUMENTS]\n", argv[0]);
     printf(
         "\n"

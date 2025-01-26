@@ -891,7 +891,7 @@ CMS::~CMS()
 
 /* This function should never be called. It exists so that classes  which */
  /* overload read, write etc don't have to bother creating it. */
-CMS_STATUS CMS::main_access(void *_local, int *serial_number)
+CMS_STATUS CMS::main_access(void *_local, int * /*serial_number*/)
 {
     rcs_print_error("CMS::main_access called by %s for %s.\n",
 	ProcessName, BufferName);
@@ -1054,7 +1054,7 @@ CMS_STATUS CMS::write_if_read(void *user_data, int *serial_number)
 // For protocols that provide No security, tell the
 // application the login was successful.
 // This method needs to be overloaded to have any security.
-int CMS::login(const char *name, const char *passwd)
+int CMS::login(const char * /*name*/, const char * /*passwd*/)
 {
     return 1;
 }
@@ -1608,7 +1608,7 @@ int CMS::set_subdivision(int _subdiv)
 }
 
 // This constructor declared private to prevent copying.
-CMS::CMS(CMS & cms)
+CMS::CMS(CMS & /*cms*/)
 {
 }
 

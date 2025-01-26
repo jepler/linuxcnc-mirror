@@ -927,6 +927,7 @@ void DrawGhostZone( cairo_t * cr, int OffX, int AddPosiY )
 
 void DrawPathLabelCommentHeader( cairo_t * cr, StrRung * Rung, int OffX, int PosiY, int BlockWidth, int HeaderHeight, char Background, char DrawingOption )
 {
+	(void)DrawingOption;
 	int HeaderBarHeight = HeaderHeight*70/100;
 	int OffsetStartY = HeaderHeight*15/100;
 	int Margin = BlockWidth/4;

@@ -267,7 +267,7 @@ static double receiveTimeout = 10.0;
 // how long to wait for Task to finish running our command
 static double doneTimeout = 60.;
 
-static void quit(int sig)
+static void quit(int /*sig*/)
 {
     done = 1;
 }

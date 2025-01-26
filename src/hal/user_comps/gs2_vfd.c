@@ -162,6 +162,7 @@ static char *ratestrings[] = {"110", "300", "600", "1200", "2400", "4800", "9600
 static char *stopstrings[] = {"1", "2", NULL};
 
 static void quit(int sig) {
+    (void)sig;
     done = 1;
 }
 
@@ -402,6 +403,7 @@ int write_data(modbus_t *mb_ctx, slavedata_t *slavedata, haldata_t *haldata) {
 }
 
 void usage(int argc, char **argv) {
+    (void)argc;
     printf("Usage:  %s [options]\n", argv[0]);
     printf(
     "This is a userspace HAL program, typically loaded using the halcmd \"loadusr\" command:\n"

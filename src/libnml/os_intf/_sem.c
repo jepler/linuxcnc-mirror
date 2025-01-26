@@ -76,6 +76,7 @@ int rcs_sem_destroy(rcs_sem_t * sem)
 int sem_clear_bus_errors = 0;
 void sem_clear_bus_error_handler(int sig)
 {
+    (void)sig;
     sem_clear_bus_errors++;
 }
 

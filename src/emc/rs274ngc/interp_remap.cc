@@ -99,7 +99,7 @@ bool Interp::remap_in_progress(const char *code)
 }
 
 
-int Interp::convert_remapped_code(block_pointer block,
+int Interp::convert_remapped_code(block_pointer /*block*/,
 				  setup_pointer settings,
 				  int phase,
 				  char letter,

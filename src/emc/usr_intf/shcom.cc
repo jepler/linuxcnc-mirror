@@ -1183,7 +1183,7 @@ int sendJointSetBacklash(int joint, double backlash)
     return 0;
 }
 
-int sendJointLoadComp(int joint, const char *file, int type)
+int sendJointLoadComp(int /*joint*/, const char *file, int type)
 {
     EMC_JOINT_LOAD_COMP emc_joint_load_comp_msg;
 

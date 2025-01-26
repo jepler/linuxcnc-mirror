@@ -130,6 +130,7 @@ PyObject *pExit,*pValue;
 static sig_atomic_t stop;
 static void quit(int sig)
 {
+    (void)sig;
     if ( ignore_sig ) {
     return;
     }

@@ -133,7 +133,7 @@ static  ParamClass param_wrapper ( Interp & inst) {
     return ParamClass(inst);
 }
 
-static int get_task(Interp &i) { return _task; };
+static int get_task(Interp & /*i*/) { return _task; };
 static const char *get_filename(Interp &i) { return i._setup.filename; };
 static const char *get_linetext(Interp &i) { return i._setup.linetext; };
 

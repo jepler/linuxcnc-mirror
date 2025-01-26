@@ -38,4 +38,4 @@ int emcAbortCleanup(EMC_ABORT reason, const char *message)
     return 0;
 }
 
-extern void emctask_quit(int sig) {};
+extern void emctask_quit(int /*sig*/) {};

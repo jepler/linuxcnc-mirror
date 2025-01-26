@@ -53,7 +53,7 @@
 #ifdef debug
 #define dbg_printf printf
 #else
-static inline int dbg_printf(char *f, ...) {return 0;}
+static inline int dbg_printf(char *f, ...) { (void)f; return 0;}
 #endif
 
 StrDatasForBase CorresDatasForBase[3] = { {BASE_MINS , TIME_BASE_MINS , "%.1fmn" , "Mins" } ,

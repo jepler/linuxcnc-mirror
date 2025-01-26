@@ -274,6 +274,7 @@ int hal_systemv(const char *const argv[]) {
 /* signal handler */
 static void quit(int sig)
 {
+    (void)sig;
     if ( hal_flag ) {
 	/* this process might have the hal mutex, so just set the
 	   'done' flag and return, exit after mutex work finishes */

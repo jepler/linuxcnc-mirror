@@ -242,6 +242,7 @@ int genser_kin_jac_inv(void *kins,
     const go_pose * pos,
     const go_screw * vel, const go_real * joints, go_real * jointvels)
 {
+    (void)pos;
     genser_struct *genser = (genser_struct *) kins;
     GO_MATRIX_DECLARE(Jfwd, Jfwd_stg, 6, GENSER_MAX_JOINTS);
     GO_MATRIX_DECLARE(Jinv, Jinv_stg, GENSER_MAX_JOINTS, 6);
@@ -282,6 +283,7 @@ int genser_kin_jac_fwd(void *kins,
     const go_real * joints,
     const go_real * jointvels, const go_pose * pos, go_screw * vel)
 {
+    (void)pos;
     genser_struct *genser = (genser_struct *) kins;
     GO_MATRIX_DECLARE(Jfwd, Jfwd_stg, 6, GENSER_MAX_JOINTS);
     go_pose T_L_0;
@@ -320,6 +322,8 @@ int genserKinematicsForward(const double *joint,
                             EmcPose * world,
                             const KINEMATICS_FORWARD_FLAGS * fflags,
                             KINEMATICS_INVERSE_FLAGS * iflags) {
+    (void)fflags;
+    (void)iflags;
 
     go_pose *pos;
     go_rpy rpy;
@@ -416,6 +420,8 @@ int genserKinematicsInverse(const EmcPose * world,
                             const KINEMATICS_INVERSE_FLAGS * iflags,
                             KINEMATICS_FORWARD_FLAGS * fflags)
 {
+    (void)iflags;
+    (void)fflags;
 
     genser_struct *genser = KINS_PTR;
     GO_MATRIX_DECLARE(Jfwd, Jfwd_stg, 6, GENSER_MAX_JOINTS);
@@ -598,6 +604,7 @@ int genserKinematicsSetup(const int comp_id,
                     const char* coordinates,
                     kparms*     kp)
 {
+    (void)coordinates;
     int i,res=0;
     haldata = hal_malloc(sizeof(struct haldata));
     if (!haldata) {goto error;}

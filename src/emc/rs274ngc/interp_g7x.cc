@@ -30,10 +30,10 @@ public:
 
 class motion_null:public motion_base {
 public:
-    void straight_move(std::complex<double> end) override  {}
-    void straight_rapid(std::complex<double> end)  override {}
-    void circular_move(bool ccw,std::complex<double> center,
-	std::complex<double> end)  override {}
+    void straight_move(std::complex<double> /*end*/) override  {}
+    void straight_rapid(std::complex<double> /*end*/)  override {}
+    void circular_move(bool /*ccw*/,std::complex<double> /*center*/,
+	std::complex<double> /*end*/)  override {}
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -63,7 +63,7 @@ public:
     virtual std::unique_ptr<segment> dup()=0;
     virtual double radius()=0;
     virtual bool monotonic() { return real(end-start)<=1e-3; }
-    virtual void do_finish(segment *prev, segment *next) {}
+    virtual void do_finish(segment * /*prev*/, segment * /*next*/) {}
     std::complex<double> &sp() { return start; }
     std::complex<double> &ep() { return end; }
 
@@ -1001,7 +1001,7 @@ public:
     DISTANCE_MODE distance_mode() { return saved_distance_mode; }
 };
 
-int Interp::convert_g7x(int mode,
+int Interp::convert_g7x(int /*mode*/,
       block_pointer block,     //!< pointer to a block of RS274 instructions
       setup_pointer settings)  //!< pointer to machine settings
 {

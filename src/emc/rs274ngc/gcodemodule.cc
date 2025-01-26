@@ -257,7 +257,7 @@ void NURBS_G5_FEED(int line_number, std::vector<NURBS_CONTROL_POINT> nurbs_contr
 
 /* G_6_2  L_option is unused */
 //-----------------------------------------------------------------------------------------------------------------------------------------
-void NURBS_G6_FEED(int line_number, std::vector<NURBS_G6_CONTROL_POINT> nurbs_control_points, unsigned int k, double feedrate, int L_option, CANON_PLANE plane) { // (L_option: NICU, NICL, NICC see publication from Lo Valvo and Drago)
+void NURBS_G6_FEED(int line_number, std::vector<NURBS_G6_CONTROL_POINT> nurbs_control_points, unsigned int k, double /*feedrate*/, int /*L_option*/, CANON_PLANE plane) { // (L_option: NICU, NICL, NICC see publication from Lo Valvo and Drago)
     double u = 0.0;
     unsigned int n = nurbs_control_points.size() - 1-k;
     double umax = nurbs_control_points[n+k].NURBS_K;
@@ -431,7 +431,7 @@ void SET_TRAVERSE_RATE(double rate) {
     Py_XDECREF(result);
 }
 
-void SET_FEED_MODE(int spindle, int mode) {
+void SET_FEED_MODE(int /*spindle*/, int /*mode*/) {
 #if 0
     maybe_new_line();   
     if(interp_error) return;
@@ -451,7 +451,7 @@ void CHANGE_TOOL() {
     Py_XDECREF(result);
 }
 
-void CHANGE_TOOL_NUMBER(int pocket) {
+void CHANGE_TOOL_NUMBER(int /*pocket*/) {
     maybe_new_line();
     if(interp_error) return;
 }
@@ -493,9 +493,9 @@ void MESSAGE(char *comment) {
     Py_XDECREF(result);
 }
 
-void LOG(char *s) {}
-void LOGOPEN(char *f) {}
-void LOGAPPEND(char *f) {}
+void LOG(char * /*s*/) {}
+void LOGOPEN(char * /*f*/) {}
+void LOGAPPEND(char * /*f*/) {}
 void LOGCLOSE() {}
 
 void COMMENT(const char *comment) {
@@ -507,8 +507,8 @@ void COMMENT(const char *comment) {
     Py_XDECREF(result);
 }
 
-void SET_TOOL_TABLE_ENTRY(int pocket, int toolno, EmcPose offset, double diameter,
-                          double frontangle, double backangle, int orientation) {
+void SET_TOOL_TABLE_ENTRY(int /*pocket*/, int /*toolno*/, EmcPose /*offset*/, double /*diameter*/,
+                          double /*frontangle*/, double /*backangle*/, int /*orientation*/) {
 }
 
 void USE_TOOL_LENGTH_OFFSET(EmcPose offset) {
@@ -524,27 +524,27 @@ void USE_TOOL_LENGTH_OFFSET(EmcPose offset) {
     Py_XDECREF(result);
 }
 
-void SET_FEED_REFERENCE(double reference) { }
-void SET_CUTTER_RADIUS_COMPENSATION(double radius) {}
-void START_CUTTER_RADIUS_COMPENSATION(int direction) {}
-void STOP_CUTTER_RADIUS_COMPENSATION(int direction) {}
+void SET_FEED_REFERENCE(double /*reference*/) { }
+void SET_CUTTER_RADIUS_COMPENSATION(double /*radius*/) {}
+void START_CUTTER_RADIUS_COMPENSATION(int /*direction*/) {}
+void STOP_CUTTER_RADIUS_COMPENSATION(int /*direction*/) {}
 void START_SPEED_FEED_SYNCH() {}
-void START_SPEED_FEED_SYNCH(int spindle, double sync, bool vel) {}
+void START_SPEED_FEED_SYNCH(int /*spindle*/, double /*sync*/, bool /*vel*/) {}
 void STOP_SPEED_FEED_SYNCH() {}
-void START_SPINDLE_COUNTERCLOCKWISE(int spindle, int wait_for_at_speed) {}
-void START_SPINDLE_CLOCKWISE(int spindle, int wait_for_at_speed) {}
-void SET_SPINDLE_MODE(int spindle, double) {}
-void STOP_SPINDLE_TURNING(int spindle) {}
-void SET_SPINDLE_SPEED(int spindle, double rpm) {}
-void ORIENT_SPINDLE(int spindle, double d, int i) {}
-void WAIT_SPINDLE_ORIENT_COMPLETE(int s, double timeout) {}
+void START_SPINDLE_COUNTERCLOCKWISE(int /*spindle*/, int /*wait_for_at_speed*/) {}
+void START_SPINDLE_CLOCKWISE(int /*spindle*/, int /*wait_for_at_speed*/) {}
+void SET_SPINDLE_MODE(int /*spindle*/, double) {}
+void STOP_SPINDLE_TURNING(int /*spindle*/) {}
+void SET_SPINDLE_SPEED(int /*spindle*/, double /*rpm*/) {}
+void ORIENT_SPINDLE(int /*spindle*/, double /*d*/, int /*i*/) {}
+void WAIT_SPINDLE_ORIENT_COMPLETE(int /*s*/, double /*timeout*/) {}
 void PROGRAM_STOP() {}
 void PROGRAM_END() {}
 void FINISH() {}
 void ON_RESET() {}
 void PALLET_SHUTTLE() {}
 void SELECT_TOOL(int tool) {selected_tool = tool;}
-void UPDATE_TAG(StateTag tag) {}
+void UPDATE_TAG(StateTag /*tag*/) {}
 void OPTIONAL_PROGRAM_STOP() {}
 int  GET_EXTERNAL_TC_FAULT() {return 0;}
 int  GET_EXTERNAL_TC_REASON() {return 0;}
@@ -564,42 +564,42 @@ extern bool GET_BLOCK_DELETE(void) {
     return bd;
 }
 
-void CANON_ERROR(const char *fmt, ...) {};
-void CLAMP_AXIS(CANON_AXIS axis) {}
+void CANON_ERROR(const char * /*fmt*/, ...) {};
+void CLAMP_AXIS(CANON_AXIS /*axis*/) {}
 bool GET_OPTIONAL_PROGRAM_STOP() { return false;}
-void SET_OPTIONAL_PROGRAM_STOP(bool state) {}
+void SET_OPTIONAL_PROGRAM_STOP(bool /*state*/) {}
 void SPINDLE_RETRACT_TRAVERSE() {}
 void SPINDLE_RETRACT() {}
 void STOP_CUTTER_RADIUS_COMPENSATION() {}
 void USE_NO_SPINDLE_FORCE() {}
-void SET_BLOCK_DELETE(bool enabled) {}
+void SET_BLOCK_DELETE(bool /*enabled*/) {}
 
 void DISABLE_FEED_OVERRIDE() {}
 void DISABLE_FEED_HOLD() {}
 void ENABLE_FEED_HOLD() {}
-void DISABLE_SPEED_OVERRIDE(int spindle) {}
+void DISABLE_SPEED_OVERRIDE(int /*spindle*/) {}
 void ENABLE_FEED_OVERRIDE() {}
-void ENABLE_SPEED_OVERRIDE(int spindle) {}
+void ENABLE_SPEED_OVERRIDE(int /*spindle*/) {}
 void MIST_OFF() {}
 void FLOOD_OFF() {}
 void MIST_ON() {}
 void FLOOD_ON() {}
-void CLEAR_AUX_OUTPUT_BIT(int bit) {}
-void SET_AUX_OUTPUT_BIT(int bit) {}
-void SET_AUX_OUTPUT_VALUE(int index, double value) {}
-void CLEAR_MOTION_OUTPUT_BIT(int bit) {}
-void SET_MOTION_OUTPUT_BIT(int bit) {}
-void SET_MOTION_OUTPUT_VALUE(int index, double value) {}
+void CLEAR_AUX_OUTPUT_BIT(int /*bit*/) {}
+void SET_AUX_OUTPUT_BIT(int /*bit*/) {}
+void SET_AUX_OUTPUT_VALUE(int /*index*/, double /*value*/) {}
+void CLEAR_MOTION_OUTPUT_BIT(int /*bit*/) {}
+void SET_MOTION_OUTPUT_BIT(int /*bit*/) {}
+void SET_MOTION_OUTPUT_VALUE(int /*index*/, double /*value*/) {}
 void TURN_PROBE_ON() {}
 void TURN_PROBE_OFF() {}
-int UNLOCK_ROTARY(int line_no, int joint_num) {return 0;}
-int LOCK_ROTARY(int line_no, int joint_num) {return 0;}
-void INTERP_ABORT(int reason,const char *message) {}
+int UNLOCK_ROTARY(int /*line_no*/, int /*joint_num*/) {return 0;}
+int LOCK_ROTARY(int /*line_no*/, int /*joint_num*/) {return 0;}
+void INTERP_ABORT(int /*reason*/, const char * /*message*/) {}
 
 void STRAIGHT_PROBE(int line_number, 
                     double x, double y, double z, 
                     double a, double b, double c,
-                    double u, double v, double w, unsigned char probe_type) {
+                    double u, double v, double w, unsigned char /*probe_type*/) {
     _pos_x=x; _pos_y=y; _pos_z=z; 
     _pos_a=a; _pos_b=b; _pos_c=c;
     _pos_u=u; _pos_v=v; _pos_w=w;
@@ -614,7 +614,7 @@ void STRAIGHT_PROBE(int line_number,
 
 }
 void RIGID_TAP(int line_number,
-               double x, double y, double z, double scale) {
+               double x, double y, double z, double /*scale*/) {
     if(metric) { x /= 25.4; y /= 25.4; z /= 25.4; }
     maybe_new_line(line_number);
     if(interp_error) return;
@@ -681,9 +681,9 @@ CANON_TOOL_TABLE GET_EXTERNAL_TOOL_TABLE(int pocket) {
     return tdata;
 }
 
-int GET_EXTERNAL_DIGITAL_INPUT(int index, int def) { return def; }
-double GET_EXTERNAL_ANALOG_INPUT(int index, double def) { return def; }
-int WAIT(int index, int input_type, int wait_type, double timeout) { return 0;}
+int GET_EXTERNAL_DIGITAL_INPUT(int /*index*/, int def) { return def; }
+double GET_EXTERNAL_ANALOG_INPUT(int /*index*/, double def) { return def; }
+int WAIT(int /*index*/, int /*input_type*/, int /*wait_type*/, double /*timeout*/) { return 0;}
 
 static void user_defined_function(int num, double arg1, double arg2) {
     if(interp_error) return;
@@ -695,7 +695,7 @@ static void user_defined_function(int num, double arg1, double arg2) {
     Py_XDECREF(result);
 }
 
-void SET_FEED_REFERENCE(CANON_FEED_REFERENCE ref) {}
+void SET_FEED_REFERENCE(CANON_FEED_REFERENCE /*ref*/) {}
 int GET_EXTERNAL_QUEUE_EMPTY() { return true; }
 CANON_DIRECTION GET_EXTERNAL_SPINDLE(int) { return CANON_STOPPED; }
 int GET_EXTERNAL_TOOL_SLOT() { return 0; }
@@ -705,12 +705,12 @@ double GET_EXTERNAL_TRAVERSE_RATE() { return 0; }
 int GET_EXTERNAL_FLOOD() { return 0; }
 int GET_EXTERNAL_MIST() { return 0; }
 CANON_PLANE GET_EXTERNAL_PLANE() { return CANON_PLANE::XY; }
-double GET_EXTERNAL_SPEED(int spindle) { return 0; }
+double GET_EXTERNAL_SPEED(int /*spindle*/) { return 0; }
 void DISABLE_ADAPTIVE_FEED() {} 
 void ENABLE_ADAPTIVE_FEED() {} 
 
 int GET_EXTERNAL_FEED_OVERRIDE_ENABLE() {return 1;}
-int GET_EXTERNAL_SPINDLE_OVERRIDE_ENABLE(int spindle) {return 1;}
+int GET_EXTERNAL_SPINDLE_OVERRIDE_ENABLE(int /*spindle*/) {return 1;}
 int GET_EXTERNAL_ADAPTIVE_FEED_ENABLE() {return 0;}
 int GET_EXTERNAL_FEED_HOLD_ENABLE() {return 1;}
 
@@ -828,14 +828,14 @@ static bool check_abort() {
 USER_DEFINED_FUNCTION_TYPE USER_DEFINED_FUNCTION[USER_DEFINED_FUNCTION_NUM];
 
 CANON_MOTION_MODE motion_mode;
-void SET_MOTION_CONTROL_MODE(CANON_MOTION_MODE mode, double tolerance) { motion_mode = mode; }
-void SET_MOTION_CONTROL_MODE(double tolerance) { }
+void SET_MOTION_CONTROL_MODE(CANON_MOTION_MODE mode, double /*tolerance*/) { motion_mode = mode; }
+void SET_MOTION_CONTROL_MODE(double /*tolerance*/) { }
 void SET_MOTION_CONTROL_MODE(CANON_MOTION_MODE mode) { motion_mode = mode; }
 CANON_MOTION_MODE GET_EXTERNAL_MOTION_CONTROL_MODE() { return motion_mode; }
-void SET_NAIVECAM_TOLERANCE(double tolerance) { }
+void SET_NAIVECAM_TOLERANCE(double /*tolerance*/) { }
 
 #define RESULT_OK (result == INTERP_OK || result == INTERP_EXECUTE_FINISH)
-static PyObject *parse_file(PyObject *self, PyObject *args) {
+static PyObject *parse_file(PyObject * /*self*/, PyObject *args) {
     char *f;
     char *unitcode=0, *initcode=0, *interpname=0;
     PyObject *initcodes=0;
@@ -948,14 +948,14 @@ out_error:
 static int maxerror = -1;
 
 static char savedError[LINELEN+1];
-static PyObject *rs274_strerror(PyObject *s, PyObject *o) {
+static PyObject *rs274_strerror(PyObject * /*s*/, PyObject *o) {
     int err;
     if(!PyArg_ParseTuple(o, "i", &err)) return nullptr;
     pinterp->error_text(err, savedError, LINELEN);
     return PyUnicode_FromString(savedError);
 }
 
-static PyObject *rs274_calc_extents(PyObject *self, PyObject *args) {
+static PyObject *rs274_calc_extents(PyObject * /*self*/, PyObject *args) {
     double min_x = 9e99, min_y = 9e99, min_z = 9e99,
            min_xt = 9e99, min_yt = 9e99, min_zt = 9e99,
            max_x = -9e99, max_y = -9e99, max_z = -9e99,
@@ -1063,7 +1063,7 @@ static void rotate(double &x, double &y, double c, double s) {
     x = tx;
 }
 
-static PyObject *rs274_arc_to_segments(PyObject *self, PyObject *args) {
+static PyObject *rs274_arc_to_segments(PyObject * /*self*/, PyObject *args) {
     PyObject *canon;
     double x1, y1, cx, cy, z1, a, b, c, u, v, w;
     double o[9], n[9], g5xoffset[9], g92offset[9];

@@ -34,13 +34,13 @@ extern "C" {
 #include "_timer.h"
 
 /* RCS_TIMER class */
-RCS_TIMER::RCS_TIMER(const char *process_name, const char *config_file)
+RCS_TIMER::RCS_TIMER(const char * /*process_name*/, const char * /*config_file*/)
 {
     zero_timer();
     set_timeout(0);
 }
 
-RCS_TIMER::RCS_TIMER(double _timeout, const char *process_name, const char *config_file)
+RCS_TIMER::RCS_TIMER(double _timeout, const char * /*process_name*/, const char * /*config_file*/)
 {
     zero_timer();
     set_timeout(_timeout);

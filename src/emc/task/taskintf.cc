@@ -1334,7 +1334,7 @@ int emcTrajResume()
     return usrmotWriteEmcmotCommand(&emcmotCommand);
 }
 
-int emcTrajDelay(double delay)
+int emcTrajDelay(double /*delay*/)
 {
     /* nothing need be done here - it's done in task controller */
 
@@ -1905,7 +1905,7 @@ int emcSpindleDecrease(int spindle)
     return usrmotWriteEmcmotCommand(&emcmotCommand);
 }
 
-int emcSpindleConstant(int spindle)
+int emcSpindleConstant(int /*spindle*/)
 {
     return 0; // nothing to do
 }

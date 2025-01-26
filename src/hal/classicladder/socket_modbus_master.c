@@ -251,6 +251,7 @@ int SendSocketModbusMaster( char * SlaveAdr, int NumPort, char * Frame, int LgtF
 {
 	int Status = -1;
 	int LgtSend;
+	(void)NumPort;
 	if ( VerifyTcpConnection( SlaveAdr ) )
 	{
 		if( ModbusConfig.ModbusDebugLevel>=2 )

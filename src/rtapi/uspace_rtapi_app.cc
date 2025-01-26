@@ -109,7 +109,7 @@ static void set_namef(const char *fmt, ...) {
 }
 
 pthread_t queue_thread;
-void *queue_function(void *arg) {
+void *queue_function(void * /*arg*/) {
     set_namef("rtapi_app:mesg");
     // note: can't use anything in this function that requires App() to exist
     // but it's OK to use functions that aren't safe for realtime (that's the
@@ -662,7 +662,7 @@ struct Posix : RtapiApp
     void do_delay(long ns);
 };
 
-static void signal_handler(int sig, siginfo_t *si, void *uctx)
+static void signal_handler(int sig, siginfo_t * /*si*/, void * /*uctx*/)
 {
     switch (sig) {
     case SIGXCPU:
@@ -955,7 +955,7 @@ rtapi_task *RtapiApp::get_task(int task_id) {
     return task;
 }
 
-void RtapiApp::unexpected_realtime_delay(rtapi_task *task, int nperiod) {
+void RtapiApp::unexpected_realtime_delay(rtapi_task *task, int /*nperiod*/) {
     static int printed = 0;
     if(!printed)
     {

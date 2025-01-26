@@ -825,6 +825,8 @@ static void log_popup(GtkWindow *parent)
 
 static void acquire_popup(GtkWidget * widget, gpointer gdata)
 {
+    (void)widget;
+    (void)gdata;
     prepare_scope_restart();
 
     /** This function doesn't directly cause the acquire menu to
@@ -934,6 +936,8 @@ static int activate_sample_thread(void)
 
 static void mult_changed(GtkAdjustment * adj, gpointer gdata)
 {
+    (void)adj;
+    (void)gdata;
     scope_horiz_t *horiz;
     int value;
 
@@ -949,11 +953,13 @@ static void mult_changed(GtkAdjustment * adj, gpointer gdata)
 
 static void zoom_changed(GtkAdjustment * adj, gpointer gdata)
 {
+    (void)gdata;
     set_horiz_zoom(gtk_adjustment_get_value(adj));
 }
 
 static void pos_changed(GtkAdjustment * adj, gpointer gdata)
 {
+    (void)gdata;
     set_horiz_pos(gtk_adjustment_get_value(adj) / 1000.0);
 }
 
@@ -1231,11 +1237,13 @@ static void format_freq_value(char *buf, int buflen, double freqval)
 }
 
 static gint horiz_press(GtkWidget *widget, GdkEventButton *event) {
+    (void)widget;
     ctrl_usr->horiz.x0 = event->x;
     return TRUE;
 }
 
 static gint horiz_motion(GtkWidget *widget, GdkEventMotion *event) {
+    (void)widget;
     scope_horiz_t *horiz = &(ctrl_usr->horiz);
 
     int motion;
@@ -1290,12 +1298,16 @@ static gint horiz_motion(GtkWidget *widget, GdkEventMotion *event) {
 }
 
 static gint horiz_release(GtkWidget *widget, GdkEventButton *event) {
+    (void)widget;
+    (void)event;
     return TRUE;
 }
 
 static gboolean configure_window(GtkWidget *widget, GdkEventConfigure *event,
                                  gpointer data)
 {
+    (void)event;
+    (void)data;
     scope_horiz_t *horiz;
     horiz = &(ctrl_usr->horiz);
 

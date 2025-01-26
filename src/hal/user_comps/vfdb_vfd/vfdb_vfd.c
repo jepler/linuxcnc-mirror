@@ -240,17 +240,20 @@ void  windup(param_pointer p)
 
 static void toggle_modbus_debug(int sig)
 {
+    (void)sig;
     param.modbus_debug = !param.modbus_debug;
     modbus_set_debug(param.ctx, param.modbus_debug);
 }
 
 static void toggle_debug(int sig)
 {
+    (void)sig;
     param.debug = !param.debug;
 }
 
 static void quit(int sig) 
 {
+    (void)sig;
     if (param.debug)
         fprintf(stderr,"quit(connection_state=%d)\n",connection_state);
 
@@ -345,6 +348,7 @@ int read_ini(param_pointer p)
 }
 
 void usage(int argc, char **argv) {
+    (void)argc;
     printf("Usage:  %s [options]\n", argv[0]);
     printf("This is a userspace HAL program, typically loaded using the halcmd \"loadusr\" command:\n"
             "    loadusr vfdb_vfd [options]\n"

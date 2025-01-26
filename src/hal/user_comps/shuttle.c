@@ -126,6 +126,7 @@ int num_devices = 0;
 
 
 static void exit_handler(int sig) {
+    (void)sig;
     printf("%s: exiting\n", modname);
     exit(0);
 }
